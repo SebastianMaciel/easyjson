@@ -25,9 +25,11 @@
 }
 
 .brand {
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 .tag {
@@ -140,7 +142,16 @@
   display: inline-flex;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  overflow: hidden;
+}
+
+.modeGroup .iconToggle:first-child {
+  border-top-left-radius: calc(var(--radius) - 1px);
+  border-bottom-left-radius: calc(var(--radius) - 1px);
+}
+
+.modeGroup .iconToggle:last-child {
+  border-top-right-radius: calc(var(--radius) - 1px);
+  border-bottom-right-radius: calc(var(--radius) - 1px);
 }
 
 .iconToggle {
@@ -174,17 +185,35 @@
   color: var(--accent);
 }
 
-.iconToggle:disabled {
-  opacity: 0.4;
+.iconToggle[aria-disabled="true"] {
   cursor: not-allowed;
+  color: var(--line-strong);
+}
+
+.iconToggle[aria-disabled="true"] svg {
+  opacity: 0.55;
+}
+
+.iconToggle[aria-disabled="true"]:hover {
+  background: var(--bg);
+  color: var(--line-strong);
 }
 
 .viewToggle {
   display: inline-flex;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  overflow: hidden;
   background: var(--bg);
+}
+
+.viewToggle .viewBtn:first-child {
+  border-top-left-radius: calc(var(--radius) - 1px);
+  border-bottom-left-radius: calc(var(--radius) - 1px);
+}
+
+.viewToggle .viewBtn:last-child {
+  border-top-right-radius: calc(var(--radius) - 1px);
+  border-bottom-right-radius: calc(var(--radius) - 1px);
 }
 
 .viewBtn {

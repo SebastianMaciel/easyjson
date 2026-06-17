@@ -335,11 +335,11 @@ function PageInner() {
                   advanced && !readOnly ? styles.iconToggleActive : ""
                 }`}
                 onClick={() => !readOnly && setAdvanced((v) => !v)}
-                disabled={readOnly}
+                aria-disabled={readOnly}
                 aria-pressed={advanced && !readOnly}
                 data-tooltip={
                   readOnly
-                    ? "Advanced disabled while read only"
+                    ? "Unlock read only (left) to use Advanced"
                     : advanced
                       ? "Disable advanced mode"
                       : "Enable advanced mode"

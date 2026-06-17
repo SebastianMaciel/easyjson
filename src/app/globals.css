@@ -1,39 +1,41 @@
 :root {
-  --bg: #ffffff;
-  --bg-soft: #f7f7f8;
-  --bg-mute: #efeff1;
-  --ink: #111315;
-  --ink-mute: #6b7077;
-  --line: #e3e4e7;
-  --line-strong: #cdcfd4;
-  --accent: #2563eb;
-  --accent-soft: #dbeafe;
-  --accent-contrast: #ffffff;
-  --ok: #16a34a;
-  --warn: #d97706;
-  --err: #dc2626;
-  --err-soft: #fee2e2;
-  --radius: 6px;
+  /* Warm document / Notion-style palette */
+  --bg: #fbfaf5;
+  --bg-soft: #f5f0e3;
+  --bg-mute: #ebe2cc;
+  --ink: #2a2418;
+  --ink-mute: #7a6f5e;
+  --line: #e6dfc9;
+  --line-strong: #ccc0a1;
+  --accent: #b54a23;        /* terracotta */
+  --accent-soft: #f3dccf;
+  --accent-contrast: #fbfaf5;
+  --ok: #4e7a4c;            /* sage */
+  --warn: #b87010;          /* warm amber */
+  --err: #b3322a;
+  --err-soft: #f3d4cf;
+  --radius: 8px;
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Instrument Serif", "Georgia", serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 [data-theme="dark"] {
-  --bg: #0e1014;
-  --bg-soft: #15181d;
-  --bg-mute: #1c2027;
-  --ink: #e7e9ec;
-  --ink-mute: #8a9099;
-  --line: #262a31;
-  --line-strong: #363b44;
-  --accent: #60a5fa;
-  --accent-soft: #1e3a5f;
-  --accent-contrast: #0e1014;
-  --ok: #4ade80;
-  --warn: #fbbf24;
-  --err: #f87171;
-  --err-soft: #3f1d1d;
+  --bg: #1c1812;
+  --bg-soft: #25201a;
+  --bg-mute: #322b22;
+  --ink: #ece4d2;
+  --ink-mute: #9d8f78;
+  --line: #3a3328;
+  --line-strong: #524938;
+  --accent: #e07c5a;
+  --accent-soft: #4a2418;
+  --accent-contrast: #1c1812;
+  --ok: #87b07f;
+  --warn: #d9a35f;
+  --err: #e0746b;
+  --err-soft: #4a201a;
 }
 
 * {
@@ -51,7 +53,7 @@ body {
   background: var(--bg);
   font-family: var(--font-sans);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -46,10 +46,11 @@
 }
 
 .title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
 }
 
 .closeBtn {
@@ -103,17 +104,19 @@
 }
 
 .body h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
   margin-bottom: 1.25rem;
   color: var(--ink);
 }
 
 .subhead {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 1.75rem 0 0.65rem;
@@ -234,18 +237,19 @@
   font-family: var(--font-mono);
 }
 
-.tString { background: #dbeafe; color: #1e40af; }
-.tNumber { background: #e0e7ff; color: #4338ca; }
-.tBool { background: #d1fae5; color: #065f46; }
+/* Warm pastel chips that play with parchment bg */
+.tString { background: #f3e6c5; color: #6e5413; }
+.tNumber { background: #d9e6c8; color: #3b5b1c; }
+.tBool { background: #c8e3d2; color: #1e5a3f; }
 .tNull { background: var(--bg-mute); color: var(--ink-mute); }
-.tObject { background: #fef3c7; color: #92400e; }
-.tArray { background: #fce7f3; color: #9d174d; }
+.tObject { background: #f0d4c2; color: #6e3617; }
+.tArray { background: #efcfd0; color: #7a3a42; }
 
-[data-theme="dark"] .tString { background: #1e3a8a; color: #bfdbfe; }
-[data-theme="dark"] .tNumber { background: #312e81; color: #c7d2fe; }
-[data-theme="dark"] .tBool { background: #064e3b; color: #a7f3d0; }
-[data-theme="dark"] .tObject { background: #78350f; color: #fde68a; }
-[data-theme="dark"] .tArray { background: #831843; color: #fbcfe8; }
+[data-theme="dark"] .tString { background: #54441a; color: #f0e0a0; }
+[data-theme="dark"] .tNumber { background: #2c441c; color: #c8e8a8; }
+[data-theme="dark"] .tBool { background: #1f4a36; color: #a8e8c8; }
+[data-theme="dark"] .tObject { background: #54281a; color: #f0c8b0; }
+[data-theme="dark"] .tArray { background: #542830; color: #f0c0c8; }
 
 .smartList {
   display: grid;

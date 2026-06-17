@@ -74,6 +74,24 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
 
   const listRef = useRef<ListImperativeAPI>(null);
 
+  // auto-expand every ancestor of the selected path so the tree reveals it
+  useEffect(() => {
+    if (selected.length === 0) return;
+    setExpanded((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (let i = 0; i < selected.length; i++) {
+        const k = pathKey(selected.slice(0, i));
+        if (!next.has(k)) {
+          next.add(k);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathKey(selected)]);
+
   // scroll selection into view on change
   const selKey = pathKey(selected);
   useEffect(() => {
