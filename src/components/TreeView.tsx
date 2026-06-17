@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   type JSONValue,
   type JSONObject,
   type Path,
+  getAt,
   isContainer,
   pathKey,
   typeOf,
@@ -25,7 +26,6 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
 
   const trimmed = query.trim().toLowerCase();
 
-  // compute which nodes match the query (themselves or have matching descendants)
   const visible = useMemo(() => {
     if (!trimmed) return null;
     const set = new Set<string>();
@@ -33,16 +33,15 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
     return set;
   }, [root, trimmed]);
 
-  // when querying, auto-expand all visible containers
   const effectiveExpanded = useMemo(() => {
     if (!visible) return expanded;
     return new Set<string>([...expanded, ...visible]);
   }, [expanded, visible]);
 
-  // when the query changes, ensure we auto-expand even though base expanded didn't change
-  useEffect(() => {
-    // no-op; effectiveExpanded already merges in visible
-  }, [visible]);
+  const flatPaths = useMemo(
+    () => flatten(root, effectiveExpanded, visible),
+    [root, effectiveExpanded, visible],
+  );
 
   const toggle = (path: Path) => {
     const key = pathKey(path);
@@ -54,8 +53,67 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
     });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
+    const selKey = pathKey(selected);
+    const idx = flatPaths.findIndex((p) => pathKey(p) === selKey);
+    if (idx === -1) return;
+    const node = getAt(root, selected);
+    const isOpen = effectiveExpanded.has(selKey);
+    const container = isContainer(node);
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        if (idx < flatPaths.length - 1) onSelect(flatPaths[idx + 1]);
+        return;
+      case "ArrowUp":
+        e.preventDefault();
+        if (idx > 0) onSelect(flatPaths[idx - 1]);
+        return;
+      case "ArrowRight":
+        e.preventDefault();
+        if (container) {
+          if (!isOpen) {
+            toggle(selected);
+          } else if (idx < flatPaths.length - 1) {
+            onSelect(flatPaths[idx + 1]);
+          }
+        }
+        return;
+      case "ArrowLeft":
+        e.preventDefault();
+        if (container && isOpen) {
+          toggle(selected);
+        } else if (selected.length > 0) {
+          onSelect(selected.slice(0, -1));
+        }
+        return;
+      case "Home":
+        e.preventDefault();
+        onSelect(flatPaths[0]);
+        return;
+      case "End":
+        e.preventDefault();
+        onSelect(flatPaths[flatPaths.length - 1]);
+        return;
+      case "Enter":
+      case " ":
+        if (container) {
+          e.preventDefault();
+          toggle(selected);
+        }
+        return;
+    }
+  };
+
   return (
-    <ul className={styles.tree} role="tree">
+    <ul
+      className={styles.tree}
+      role="tree"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      aria-activedescendant={`tn-${pathKey(selected)}`}
+    >
       <TreeNode
         nodeKey="root"
         value={root}
@@ -70,6 +128,29 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
       />
     </ul>
   );
+}
+
+function flatten(
+  root: JSONValue,
+  expanded: Set<string>,
+  visible: Set<string> | null,
+): Path[] {
+  const out: Path[] = [];
+  const recurse = (value: JSONValue, path: Path) => {
+    if (visible && !visible.has(pathKey(path))) return;
+    out.push(path);
+    if (!isContainer(value)) return;
+    if (!expanded.has(pathKey(path))) return;
+    if (Array.isArray(value)) {
+      (value as JSONValue[]).forEach((v, i) => recurse(v, [...path, i]));
+    } else {
+      Object.entries(value as JSONObject).forEach(([k, v]) =>
+        recurse(v, [...path, k]),
+      );
+    }
+  };
+  recurse(root, []);
+  return out;
 }
 
 function walk(
@@ -164,6 +245,7 @@ function TreeNode({
   return (
     <li role="treeitem" aria-expanded={container ? isExpanded : undefined}>
       <div
+        id={`tn-${pathKey(path)}`}
         className={`${styles.row} ${isSelected ? styles.selected : ""}`}
         onClick={() => onSelect(path)}
       >

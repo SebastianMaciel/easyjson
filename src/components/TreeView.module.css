@@ -4,6 +4,11 @@
   font-size: 13px;
   user-select: none;
   padding: 0.5rem;
+  outline: none;
+}
+
+.tree:focus-visible .selected {
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .tree ul {
