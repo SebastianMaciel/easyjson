@@ -219,6 +219,40 @@
   color: var(--err);
 }
 
+.moveGroup {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.moveBtn {
+  width: 24px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-mute);
+  background: var(--bg);
+  font-size: 12px;
+  line-height: 1;
+  border-right: 1px solid var(--line);
+}
+
+.moveBtn:last-child {
+  border-right: none;
+}
+
+.moveBtn:hover:not(:disabled) {
+  background: var(--bg-mute);
+  color: var(--ink);
+}
+
+.moveBtn:disabled {
+  color: var(--line-strong);
+  cursor: not-allowed;
+}
+
 .duplicateBtn {
   width: 28px;
   height: 28px;

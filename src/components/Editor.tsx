@@ -29,6 +29,7 @@ type Props = {
   onChange: (next: JSONValue) => void;
   onDelete: (path: Path) => void;
   onDuplicate: (path: Path) => void;
+  onMove: (path: Path, direction: "up" | "down") => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 };
@@ -40,6 +41,7 @@ export default function Editor({
   onChange,
   onDelete,
   onDuplicate,
+  onMove,
   onNavigate,
   advanced,
 }: Props) {
@@ -84,6 +86,7 @@ export default function Editor({
           onChildChange={handleChildChange}
           onDelete={onDelete}
           onDuplicate={onDuplicate}
+          onMove={onMove}
           onNavigate={onNavigate}
           advanced={advanced}
         />
@@ -271,6 +274,7 @@ function ArrayEditor({
   onChildChange,
   onDelete,
   onDuplicate,
+  onMove,
   onNavigate,
   advanced,
 }: {
@@ -282,6 +286,7 @@ function ArrayEditor({
   onChildChange: (key: string | number, v: JSONValue) => void;
   onDelete: (path: Path) => void;
   onDuplicate: (path: Path) => void;
+  onMove: (path: Path, direction: "up" | "down") => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 }) {
@@ -310,6 +315,12 @@ function ArrayEditor({
               onRename={() => {}}
               onDelete={() => onDelete([...path, i])}
               onDuplicate={() => onDuplicate([...path, i])}
+              onMoveUp={i > 0 ? () => onMove([...path, i], "up") : undefined}
+              onMoveDown={
+                i < items.length - 1
+                  ? () => onMove([...path, i], "down")
+                  : undefined
+              }
             />
           ))
         )}
@@ -339,6 +350,8 @@ function ChildRow({
   onRename,
   onDelete,
   onDuplicate,
+  onMoveUp,
+  onMoveDown,
 }: {
   parentPath: Path;
   isArray: boolean;
@@ -353,6 +366,8 @@ function ChildRow({
   onRename: (newKey: string) => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }) {
   const t = typeOf(value);
   const confirm = useConfirm();
@@ -493,6 +508,30 @@ function ChildRow({
         {advanced && (
           <>
             <TypeSelector current={t} onChangeType={handleTypeChange} />
+            {isArray && (
+              <div className={styles.moveGroup}>
+                <button
+                  type="button"
+                  className={styles.moveBtn}
+                  onClick={onMoveUp}
+                  disabled={!onMoveUp}
+                  aria-label="Move up"
+                  data-tooltip="Move up"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  className={styles.moveBtn}
+                  onClick={onMoveDown}
+                  disabled={!onMoveDown}
+                  aria-label="Move down"
+                  data-tooltip="Move down"
+                >
+                  ↓
+                </button>
+              </div>
+            )}
             <button
               type="button"
               className={styles.duplicateBtn}

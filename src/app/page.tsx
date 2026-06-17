@@ -15,6 +15,7 @@ import {
   duplicateAt,
   getAt,
   isContainer,
+  moveArrayItem,
   pretty,
 } from "@/lib/json";
 import styles from "./page.module.css";
@@ -143,6 +144,29 @@ function PageInner() {
       if (!result) return;
       setData(result.root);
       setSelected(result.newPath);
+    },
+    [data],
+  );
+
+  const handleMove = useCallback(
+    (path: Path, direction: "up" | "down") => {
+      if (data === null) return;
+      const result = moveArrayItem(data, path, direction);
+      if (!result) return;
+      setData(result.root);
+      setSelected((curr) => {
+        if (
+          curr.length >= path.length &&
+          path.every((k, i) => k === curr[i]) &&
+          typeof curr[path.length - 1] === "number"
+        ) {
+          return [
+            ...result.newPath,
+            ...curr.slice(path.length),
+          ];
+        }
+        return curr;
+      });
     },
     [data],
   );
@@ -323,6 +347,7 @@ function PageInner() {
               onChange={handleChange}
               onDelete={handleDelete}
               onDuplicate={handleDuplicate}
+              onMove={handleMove}
               onNavigate={setSelected}
               advanced={advanced}
             />
