@@ -103,20 +103,46 @@
   font-weight: inherit;
   color: inherit;
   text-align: left;
-  padding: 0.2rem 0.3rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.keyButton > span:first-child {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  min-width: 0;
+}
+
+.keyButton:not(:disabled) {
+  border: 1px dashed var(--line-strong);
+  cursor: text;
 }
 
 .keyButton:not(:disabled):hover {
   background: var(--bg-mute);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .keyButton:disabled {
   cursor: default;
+}
+
+.keyPencil {
+  font-size: 11px;
+  color: var(--ink-mute);
+  font-style: normal;
+  flex-shrink: 0;
+}
+
+.keyButton:not(:disabled):hover .keyPencil {
+  color: var(--accent);
 }
 
 .keyInputWrap {

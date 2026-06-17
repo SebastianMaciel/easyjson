@@ -458,7 +458,12 @@ function ChildRow({
             onClick={() => advanced && setRenaming(true)}
             title={advanced ? "Click to rename" : ""}
           >
-            {keyOrIndex}
+            <span>{keyOrIndex}</span>
+            {advanced && (
+              <span className={styles.keyPencil} aria-hidden="true">
+                ✎
+              </span>
+            )}
           </button>
         )}
       </div>
