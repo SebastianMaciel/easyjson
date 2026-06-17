@@ -1,6 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  List,
+  type ListImperativeAPI,
+  type RowComponentProps,
+} from "react-window";
 import {
   type JSONValue,
   type JSONObject,
@@ -19,6 +24,20 @@ type Props = {
   onSelect: (p: Path) => void;
 };
 
+type FlatItem = {
+  path: Path;
+  label: string;
+  depth: number;
+  container: boolean;
+  expanded: boolean;
+  isArray: boolean;
+  childCount: number;
+  preview: string;
+  isRoot: boolean;
+};
+
+const ROW_HEIGHT = 28;
+
 export default function TreeView({ root, selected, query, onSelect }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set([pathKey([])]),
@@ -29,7 +48,7 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
   const visible = useMemo(() => {
     if (!trimmed) return null;
     const set = new Set<string>();
-    walk(root, [], trimmed, set);
+    walkSearch(root, [], trimmed, set);
     return set;
   }, [root, trimmed]);
 
@@ -38,7 +57,7 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
     return new Set<string>([...expanded, ...visible]);
   }, [expanded, visible]);
 
-  const flatPaths = useMemo(
+  const flatItems = useMemo(
     () => flatten(root, effectiveExpanded, visible),
     [root, effectiveExpanded, visible],
   );
@@ -53,9 +72,19 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
     });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
-    const selKey = pathKey(selected);
-    const idx = flatPaths.findIndex((p) => pathKey(p) === selKey);
+  const listRef = useRef<ListImperativeAPI>(null);
+
+  // scroll selection into view on change
+  const selKey = pathKey(selected);
+  useEffect(() => {
+    const idx = flatItems.findIndex((it) => pathKey(it.path) === selKey);
+    if (idx >= 0 && listRef.current) {
+      listRef.current.scrollToRow({ index: idx, align: "smart" });
+    }
+  }, [selKey, flatItems]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const idx = flatItems.findIndex((it) => pathKey(it.path) === selKey);
     if (idx === -1) return;
     const node = getAt(root, selected);
     const isOpen = effectiveExpanded.has(selKey);
@@ -64,37 +93,31 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        if (idx < flatPaths.length - 1) onSelect(flatPaths[idx + 1]);
+        if (idx < flatItems.length - 1) onSelect(flatItems[idx + 1].path);
         return;
       case "ArrowUp":
         e.preventDefault();
-        if (idx > 0) onSelect(flatPaths[idx - 1]);
+        if (idx > 0) onSelect(flatItems[idx - 1].path);
         return;
       case "ArrowRight":
         e.preventDefault();
         if (container) {
-          if (!isOpen) {
-            toggle(selected);
-          } else if (idx < flatPaths.length - 1) {
-            onSelect(flatPaths[idx + 1]);
-          }
+          if (!isOpen) toggle(selected);
+          else if (idx < flatItems.length - 1) onSelect(flatItems[idx + 1].path);
         }
         return;
       case "ArrowLeft":
         e.preventDefault();
-        if (container && isOpen) {
-          toggle(selected);
-        } else if (selected.length > 0) {
-          onSelect(selected.slice(0, -1));
-        }
+        if (container && isOpen) toggle(selected);
+        else if (selected.length > 0) onSelect(selected.slice(0, -1));
         return;
       case "Home":
         e.preventDefault();
-        onSelect(flatPaths[0]);
+        onSelect(flatItems[0].path);
         return;
       case "End":
         e.preventDefault();
-        onSelect(flatPaths[flatPaths.length - 1]);
+        onSelect(flatItems[flatItems.length - 1].path);
         return;
       case "Enter":
       case " ":
@@ -107,53 +130,88 @@ export default function TreeView({ root, selected, query, onSelect }: Props) {
   };
 
   return (
-    <ul
+    <div
       className={styles.tree}
       role="tree"
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      aria-activedescendant={`tn-${pathKey(selected)}`}
+      aria-activedescendant={`tn-${selKey}`}
     >
-      <TreeNode
-        nodeKey="root"
-        value={root}
-        path={[]}
-        selected={selected}
-        expanded={effectiveExpanded}
-        visible={visible}
-        query={trimmed}
-        onToggle={toggle}
-        onSelect={onSelect}
-        isRoot
+      <List
+        listRef={listRef}
+        rowCount={flatItems.length}
+        rowHeight={ROW_HEIGHT}
+        rowComponent={Row}
+        rowProps={{ items: flatItems, selectedKey: selKey, query: trimmed, onSelect, onToggle: toggle }}
+        className={styles.list}
       />
-    </ul>
+    </div>
   );
 }
 
-function flatten(
-  root: JSONValue,
-  expanded: Set<string>,
-  visible: Set<string> | null,
-): Path[] {
-  const out: Path[] = [];
-  const recurse = (value: JSONValue, path: Path) => {
-    if (visible && !visible.has(pathKey(path))) return;
-    out.push(path);
-    if (!isContainer(value)) return;
-    if (!expanded.has(pathKey(path))) return;
-    if (Array.isArray(value)) {
-      (value as JSONValue[]).forEach((v, i) => recurse(v, [...path, i]));
-    } else {
-      Object.entries(value as JSONObject).forEach(([k, v]) =>
-        recurse(v, [...path, k]),
-      );
-    }
-  };
-  recurse(root, []);
-  return out;
+type RowProps = {
+  items: FlatItem[];
+  selectedKey: string;
+  query: string;
+  onSelect: (p: Path) => void;
+  onToggle: (p: Path) => void;
+};
+
+function Row({
+  index,
+  style,
+  items,
+  selectedKey,
+  query,
+  onSelect,
+  onToggle,
+}: RowComponentProps<RowProps>) {
+  const item = items[index];
+  if (!item) return null;
+  const itemKey = pathKey(item.path);
+  const isSelected = itemKey === selectedKey;
+  const indent = 0.6 + item.depth * 0.9;
+
+  return (
+    <div
+      id={`tn-${itemKey}`}
+      style={style}
+      className={`${styles.row} ${isSelected ? styles.selected : ""}`}
+      onClick={() => onSelect(item.path)}
+    >
+      <span
+        className={styles.rowInner}
+        style={{ paddingLeft: `${indent}rem` }}
+      >
+        {item.container ? (
+          <button
+            type="button"
+            className={styles.chevron}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(item.path);
+            }}
+            aria-label={item.expanded ? "Collapse" : "Expand"}
+          >
+            {item.expanded ? "▾" : "▸"}
+          </button>
+        ) : (
+          <span className={styles.chevronSpace} />
+        )}
+        <span className={styles.label}>{highlight(item.label, query)}</span>
+        <span className={styles.meta}>
+          {item.container
+            ? item.isArray
+              ? ` [${item.childCount}]`
+              : ` {${item.childCount}}`
+            : `: ${item.preview}`}
+        </span>
+      </span>
+    </div>
+  );
 }
 
-function walk(
+function walkSearch(
   value: JSONValue,
   path: Path,
   query: string,
@@ -168,11 +226,13 @@ function walk(
   if (isContainer(value)) {
     if (Array.isArray(value)) {
       value.forEach((v, i) => {
-        if (walk(v as JSONValue, [...path, i], query, out)) childMatches = true;
+        if (walkSearch(v as JSONValue, [...path, i], query, out))
+          childMatches = true;
       });
     } else {
       Object.entries(value as JSONObject).forEach(([k, v]) => {
-        if (walk(v as JSONValue, [...path, k], query, out)) childMatches = true;
+        if (walkSearch(v as JSONValue, [...path, k], query, out))
+          childMatches = true;
       });
     }
   }
@@ -183,110 +243,47 @@ function walk(
   return false;
 }
 
-type NodeProps = {
-  nodeKey: string;
-  value: JSONValue;
-  path: Path;
-  selected: Path;
-  expanded: Set<string>;
-  visible: Set<string> | null;
-  query: string;
-  onToggle: (p: Path) => void;
-  onSelect: (p: Path) => void;
-  isRoot?: boolean;
-};
-
-function TreeNode({
-  nodeKey,
-  value,
-  path,
-  selected,
-  expanded,
-  visible,
-  query,
-  onToggle,
-  onSelect,
-  isRoot,
-}: NodeProps) {
-  const t = typeOf(value);
-  const container = isContainer(value);
-  const isExpanded = expanded.has(pathKey(path));
-  const isSelected = pathKey(selected) === pathKey(path);
-
-  const children = useMemo(() => {
-    if (!container) return [];
-    if (t === "array") {
-      return (value as unknown[]).map((v, i) => ({
-        key: String(i),
-        value: v as JSONValue,
-        path: [...path, i] as Path,
-      }));
+function flatten(
+  root: JSONValue,
+  expanded: Set<string>,
+  visible: Set<string> | null,
+): FlatItem[] {
+  const out: FlatItem[] = [];
+  const recurse = (value: JSONValue, path: Path, depth: number) => {
+    if (visible && !visible.has(pathKey(path))) return;
+    const t = typeOf(value);
+    const container = isContainer(value);
+    const isArray = t === "array";
+    const childCount = !container
+      ? 0
+      : isArray
+        ? (value as JSONValue[]).length
+        : Object.keys(value as JSONObject).length;
+    out.push({
+      path,
+      label: path.length === 0 ? "root" : String(path[path.length - 1]),
+      depth,
+      container,
+      expanded: expanded.has(pathKey(path)),
+      isArray,
+      childCount,
+      preview: container ? "" : preview(value),
+      isRoot: path.length === 0,
+    });
+    if (!container) return;
+    if (!expanded.has(pathKey(path))) return;
+    if (Array.isArray(value)) {
+      (value as JSONValue[]).forEach((v, i) =>
+        recurse(v, [...path, i], depth + 1),
+      );
+    } else {
+      Object.entries(value as JSONObject).forEach(([k, v]) =>
+        recurse(v, [...path, k], depth + 1),
+      );
     }
-    return Object.entries(value as Record<string, JSONValue>).map(
-      ([k, v]) => ({
-        key: k,
-        value: v,
-        path: [...path, k] as Path,
-      }),
-    );
-  }, [container, t, value, path]);
-
-  const visibleChildren = visible
-    ? children.filter((c) => visible.has(pathKey(c.path)))
-    : children;
-
-  const label = isRoot ? "root" : nodeKey;
-  const previewSuffix = container
-    ? t === "array"
-      ? ` [${children.length}]`
-      : ` {${children.length}}`
-    : "";
-
-  return (
-    <li role="treeitem" aria-expanded={container ? isExpanded : undefined}>
-      <div
-        id={`tn-${pathKey(path)}`}
-        className={`${styles.row} ${isSelected ? styles.selected : ""}`}
-        onClick={() => onSelect(path)}
-      >
-        {container ? (
-          <button
-            type="button"
-            className={styles.chevron}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle(path);
-            }}
-            aria-label={isExpanded ? "Collapse" : "Expand"}
-          >
-            {isExpanded ? "▾" : "▸"}
-          </button>
-        ) : (
-          <span className={styles.chevronSpace} />
-        )}
-        <span className={styles.label}>{highlight(label, query)}</span>
-        <span className={styles.meta}>{previewSuffix || `: ${preview(value)}`}</span>
-      </div>
-      {container && isExpanded && visibleChildren.length > 0 && (
-        <ul className={styles.children}>
-          {visibleChildren.map((c) => (
-            <TreeNode
-              key={c.key}
-              nodeKey={c.key}
-              value={c.value}
-              path={c.path}
-              selected={selected}
-              expanded={expanded}
-              visible={visible}
-              query={query}
-              onToggle={onToggle}
-              onSelect={onSelect}
-            />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+  };
+  recurse(root, [], 0);
+  return out;
 }
 
 function preview(v: JSONValue): string {

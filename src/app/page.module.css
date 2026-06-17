@@ -238,7 +238,7 @@
 
 .treePane {
   border-right: 1px solid var(--line);
-  overflow-y: auto;
+  overflow: hidden;
   background: var(--bg-soft);
   display: flex;
   flex-direction: column;
