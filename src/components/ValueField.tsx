@@ -15,13 +15,26 @@ type Props = {
   onChange: (v: JSONValue) => void;
   onOpen?: () => void;
   advanced: boolean;
+  readOnly?: boolean;
 };
 
-export default function ValueField({ value, onChange, onOpen, advanced }: Props) {
+export default function ValueField({
+  value,
+  onChange,
+  onOpen,
+  advanced,
+  readOnly = false,
+}: Props) {
   const t = typeOf(value);
 
   if (t === "string") {
-    return <StringField value={value as string} onChange={onChange} />;
+    return (
+      <StringField
+        value={value as string}
+        onChange={onChange}
+        readOnly={readOnly}
+      />
+    );
   }
 
   if (t === "number") {
@@ -30,6 +43,8 @@ export default function ValueField({ value, onChange, onOpen, advanced }: Props)
         type="number"
         className={styles.input}
         value={value as number}
+        readOnly={readOnly}
+        disabled={readOnly}
         onChange={(e) => {
           const n = e.target.value === "" ? 0 : Number(e.target.value);
           if (!Number.isNaN(n)) onChange(n);
@@ -44,6 +59,7 @@ export default function ValueField({ value, onChange, onOpen, advanced }: Props)
         <input
           type="checkbox"
           checked={value as boolean}
+          disabled={readOnly}
           onChange={(e) => onChange(e.target.checked)}
           className={styles.toggle}
         />
@@ -55,6 +71,9 @@ export default function ValueField({ value, onChange, onOpen, advanced }: Props)
   }
 
   if (t === "null") {
+    if (readOnly) {
+      return <span className={styles.nullBadge}>empty (null)</span>;
+    }
     return (
       <div className={styles.nullValue}>
         <span className={styles.nullBadge}>empty (null)</span>
@@ -108,10 +127,15 @@ export default function ValueField({ value, onChange, onOpen, advanced }: Props)
 function StringField({
   value,
   onChange,
+  readOnly,
 }: {
   value: string;
   onChange: (v: JSONValue) => void;
+  readOnly: boolean;
 }) {
+  const ro = readOnly
+    ? { readOnly: true, disabled: false }
+    : { readOnly: false };
   const isMultiline = value.includes("\n") || value.length > 80;
   if (isMultiline) {
     return (
@@ -120,6 +144,7 @@ function StringField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={Math.min(8, Math.max(2, value.split("\n").length))}
+        {...ro}
       />
     );
   }
@@ -131,6 +156,7 @@ function StringField({
         className={styles.input}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        {...ro}
       />
     );
   }
@@ -143,6 +169,7 @@ function StringField({
         className={styles.input}
         value={head}
         onChange={(e) => onChange(e.target.value + tail)}
+        {...ro}
       />
     );
   }
@@ -154,6 +181,7 @@ function StringField({
         className={styles.input}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        {...ro}
       />
     );
   }
@@ -175,6 +203,7 @@ function StringField({
           className={styles.colorPicker}
           value={pickerValue}
           onChange={(e) => onChange(e.target.value)}
+          disabled={readOnly}
           aria-label="Color picker"
         />
         <input
@@ -182,6 +211,7 @@ function StringField({
           className={`${styles.input} ${styles.colorText}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          {...ro}
         />
       </div>
     );
@@ -194,6 +224,7 @@ function StringField({
           className={`${styles.input} ${styles.adornedInput}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          {...ro}
         />
         <a
           className={styles.adornBtn}
@@ -217,6 +248,7 @@ function StringField({
           className={`${styles.input} ${styles.adornedInput}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          {...ro}
         />
         <a
           className={styles.adornBtn}
@@ -239,6 +271,7 @@ function StringField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           spellCheck={false}
+          {...ro}
         />
         <span className={styles.uuidBadge}>UUID</span>
       </div>
@@ -250,6 +283,7 @@ function StringField({
       className={styles.input}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      {...ro}
     />
   );
 }

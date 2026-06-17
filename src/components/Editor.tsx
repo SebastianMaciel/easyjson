@@ -32,6 +32,7 @@ type Props = {
   onMove: (path: Path, direction: "up" | "down") => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
+  readOnly?: boolean;
 };
 
 export default function Editor({
@@ -44,6 +45,7 @@ export default function Editor({
   onMove,
   onNavigate,
   advanced,
+  readOnly = false,
 }: Props) {
   const node = getAt(root, path);
   const nodeType = typeOf(node);
@@ -72,6 +74,7 @@ export default function Editor({
           value={node}
           onChange={(v) => onChange(setAt(root, path, v))}
           advanced={advanced}
+          readOnly={readOnly}
           canChangeType={path.length > 0}
           reset={resetInfo(path)}
           onReset={(v) => onChange(setAt(root, path, v))}
@@ -89,6 +92,7 @@ export default function Editor({
           onMove={onMove}
           onNavigate={onNavigate}
           advanced={advanced}
+          readOnly={readOnly}
         />
       ) : (
         <ObjectEditor
@@ -102,6 +106,7 @@ export default function Editor({
           onDuplicate={onDuplicate}
           onNavigate={onNavigate}
           advanced={advanced}
+          readOnly={readOnly}
         />
       )}
     </div>
@@ -146,6 +151,7 @@ function PrimitiveEditor({
   value,
   onChange,
   advanced,
+  readOnly,
   canChangeType,
   reset,
   onReset,
@@ -154,6 +160,7 @@ function PrimitiveEditor({
   value: JSONValue;
   onChange: (v: JSONValue) => void;
   advanced: boolean;
+  readOnly: boolean;
   canChangeType: boolean;
   reset: { value: JSONValue } | null;
   onReset: (v: JSONValue) => void;
@@ -164,11 +171,18 @@ function PrimitiveEditor({
       <div className={styles.fieldRow}>
         <label className={styles.fieldLabel}>{label}</label>
         <div className={styles.fieldValue}>
-          <ValueField value={value} onChange={onChange} advanced={advanced} />
+          <ValueField
+            value={value}
+            onChange={onChange}
+            advanced={advanced}
+            readOnly={readOnly}
+          />
         </div>
         <div className={styles.fieldActions}>
-          {reset && <ResetButton orig={reset.value} onReset={onReset} />}
-          {advanced && canChangeType && (
+          {!readOnly && reset && (
+            <ResetButton orig={reset.value} onReset={onReset} />
+          )}
+          {!readOnly && advanced && canChangeType && (
             <TypeSelector
               current={t}
               onChangeType={(nt) => onChange(coerce(value, nt))}
@@ -211,6 +225,7 @@ function ObjectEditor({
   onDuplicate,
   onNavigate,
   advanced,
+  readOnly,
 }: {
   root: JSONValue;
   path: Path;
@@ -222,6 +237,7 @@ function ObjectEditor({
   onDuplicate: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
+  readOnly: boolean;
 }) {
   const keys = Object.keys(obj);
   return (
@@ -241,6 +257,7 @@ function ObjectEditor({
               keyOrIndex={k}
               value={obj[k]}
               advanced={advanced}
+              readOnly={readOnly}
               siblingKeys={keys}
               reset={resetInfo([...path, k])}
               onReset={(v) => onChange(setAt(root, [...path, k], v))}
@@ -253,7 +270,7 @@ function ObjectEditor({
           ))
         )}
       </div>
-      {advanced && (
+      {advanced && !readOnly && (
         <AddField
           existingKeys={keys}
           onAdd={(newKey, type) =>
@@ -277,6 +294,7 @@ function ArrayEditor({
   onMove,
   onNavigate,
   advanced,
+  readOnly,
 }: {
   root: JSONValue;
   path: Path;
@@ -289,6 +307,7 @@ function ArrayEditor({
   onMove: (path: Path, direction: "up" | "down") => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
+  readOnly: boolean;
 }) {
   return (
     <div className={styles.section}>
@@ -307,6 +326,7 @@ function ArrayEditor({
               keyOrIndex={i}
               value={v}
               advanced={advanced}
+              readOnly={readOnly}
               siblingKeys={[]}
               reset={resetInfo([...path, i])}
               onReset={(nv) => onChange(setAt(root, [...path, i], nv))}
@@ -325,7 +345,7 @@ function ArrayEditor({
           ))
         )}
       </div>
-      {advanced && (
+      {advanced && !readOnly && (
         <AddItem
           onAdd={(type) =>
             onChange(setAt(root, [...path, items.length], defaultValueFor(type)))
@@ -342,6 +362,7 @@ function ChildRow({
   keyOrIndex,
   value,
   advanced,
+  readOnly,
   siblingKeys,
   reset,
   onReset,
@@ -358,6 +379,7 @@ function ChildRow({
   keyOrIndex: string | number;
   value: JSONValue;
   advanced: boolean;
+  readOnly: boolean;
   siblingKeys: string[];
   reset: { value: JSONValue } | null;
   onReset: (v: JSONValue) => void;
@@ -481,9 +503,11 @@ function ChildRow({
           <button
             type="button"
             className={styles.keyButton}
-            disabled={!advanced}
-            onClick={() => advanced && setRenaming(true)}
-            data-tooltip={advanced ? "Click to rename" : undefined}
+            disabled={!advanced || readOnly}
+            onClick={() => advanced && !readOnly && setRenaming(true)}
+            data-tooltip={
+              advanced && !readOnly ? "Click to rename" : undefined
+            }
             data-tooltip-pos="bottom"
           >
             <span>{keyOrIndex}</span>
@@ -501,11 +525,14 @@ function ChildRow({
           onChange={onChildChange}
           onOpen={onNavigate}
           advanced={advanced}
+          readOnly={readOnly}
         />
       </div>
       <div className={styles.fieldActions}>
-        {reset && <ResetButton orig={reset.value} onReset={onReset} />}
-        {advanced && (
+        {!readOnly && reset && (
+          <ResetButton orig={reset.value} onReset={onReset} />
+        )}
+        {advanced && !readOnly && (
           <>
             <TypeSelector current={t} onChangeType={handleTypeChange} />
             {isArray && (

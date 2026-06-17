@@ -78,6 +78,7 @@ function PageInner() {
   const [filename, setFilename] = useState("untitled.json");
   const [selected, setSelected] = useState<Path>([]);
   const [advanced, setAdvanced] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [restored, setRestored] = useState(false);
   const [search, setSearch] = useState("");
@@ -105,12 +106,14 @@ function PageInner() {
           filename?: string;
           selected?: Path;
           advanced?: boolean;
+          readOnly?: boolean;
         };
         if (s.data !== undefined) setData(s.data);
         if (s.original !== undefined) setOriginal(s.original);
         if (typeof s.filename === "string") setFilename(s.filename);
         if (Array.isArray(s.selected)) setSelected(s.selected);
         if (typeof s.advanced === "boolean") setAdvanced(s.advanced);
+        if (typeof s.readOnly === "boolean") setReadOnly(s.readOnly);
       }
     } catch {
       // ignore corrupted session
@@ -128,12 +131,12 @@ function PageInner() {
     try {
       localStorage.setItem(
         "easyjson.session",
-        JSON.stringify({ data, original, filename, selected, advanced }),
+        JSON.stringify({ data, original, filename, selected, advanced, readOnly }),
       );
     } catch {
       // quota exceeded or unavailable — silently ignore
     }
-  }, [restored, data, original, filename, selected, advanced]);
+  }, [restored, data, original, filename, selected, advanced, readOnly]);
 
   // apply theme to <html>
   useEffect(() => {
@@ -295,7 +298,20 @@ function PageInner() {
           <label className={styles.advancedToggle}>
             <input
               type="checkbox"
-              checked={advanced}
+              checked={readOnly}
+              onChange={(e) => setReadOnly(e.target.checked)}
+            />
+            <span>Read only</span>
+          </label>
+          <label
+            className={`${styles.advancedToggle} ${
+              readOnly ? styles.toggleDisabled : ""
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={advanced && !readOnly}
+              disabled={readOnly}
               onChange={(e) => setAdvanced(e.target.checked)}
             />
             <span>Advanced mode</span>
@@ -385,7 +401,8 @@ function PageInner() {
               onDuplicate={handleDuplicate}
               onMove={handleMove}
               onNavigate={setSelected}
-              advanced={advanced}
+              advanced={advanced && !readOnly}
+              readOnly={readOnly}
             />
           ) : (
             <RawView data={data} />

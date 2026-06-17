@@ -152,6 +152,15 @@
   color: var(--ink);
 }
 
+.toggleDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toggleDisabled:hover {
+  color: var(--ink-mute);
+}
+
 .btnGhost {
   padding: 0.5rem 0.85rem;
   border-radius: var(--radius);
