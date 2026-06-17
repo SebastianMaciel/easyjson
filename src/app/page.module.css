@@ -105,9 +105,15 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.headerGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .modeGroup {

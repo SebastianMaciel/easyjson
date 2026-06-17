@@ -320,79 +320,91 @@ function PageInner() {
           <FilenameField filename={filename} onChange={setFilename} />
         </div>
         <div className={styles.headerRight}>
-          <div className={styles.viewToggle} role="tablist" aria-label="View mode">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === "form"}
-              className={`${styles.viewBtn} ${
-                viewMode === "form" ? styles.viewBtnActive : ""
-              }`}
-              onClick={() => setViewMode("form")}
+          <div className={styles.headerGroup} aria-label="View & editing modes">
+            <div
+              className={styles.viewToggle}
+              role="tablist"
+              aria-label="View mode"
             >
-              Form
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === "raw"}
-              className={`${styles.viewBtn} ${
-                viewMode === "raw" ? styles.viewBtnActive : ""
-              }`}
-              onClick={() => setViewMode("raw")}
-            >
-              Raw JSON
-            </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={viewMode === "form"}
+                className={`${styles.viewBtn} ${
+                  viewMode === "form" ? styles.viewBtnActive : ""
+                }`}
+                onClick={() => setViewMode("form")}
+              >
+                Form
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={viewMode === "raw"}
+                className={`${styles.viewBtn} ${
+                  viewMode === "raw" ? styles.viewBtnActive : ""
+                }`}
+                onClick={() => setViewMode("raw")}
+              >
+                Raw
+              </button>
+            </div>
+            <div className={styles.modeGroup}>
+              <button
+                type="button"
+                className={`${styles.iconToggle} ${
+                  readOnly ? styles.iconToggleActive : ""
+                }`}
+                onClick={() => setReadOnly((v) => !v)}
+                aria-pressed={readOnly}
+                data-tooltip={
+                  readOnly ? "Disable read only" : "Enable read only"
+                }
+                data-tooltip-pos="bottom"
+              >
+                <LockIcon locked={readOnly} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.iconToggle} ${
+                  advanced && !readOnly ? styles.iconToggleActive : ""
+                }`}
+                onClick={() => !readOnly && setAdvanced((v) => !v)}
+                disabled={readOnly}
+                aria-pressed={advanced && !readOnly}
+                data-tooltip={
+                  readOnly
+                    ? "Advanced disabled while read only"
+                    : advanced
+                      ? "Disable advanced mode"
+                      : "Enable advanced mode"
+                }
+                data-tooltip-pos="bottom"
+              >
+                <SlidersIcon />
+              </button>
+            </div>
           </div>
-          <div className={styles.modeGroup}>
+
+          <div className={styles.headerGroup} aria-label="App settings">
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <button
               type="button"
-              className={`${styles.iconToggle} ${
-                readOnly ? styles.iconToggleActive : ""
-              }`}
-              onClick={() => setReadOnly((v) => !v)}
-              aria-pressed={readOnly}
-              data-tooltip={readOnly ? "Disable read only" : "Enable read only"}
+              className={styles.btnGhost}
+              onClick={handleReset}
+              data-tooltip="Discard and start over"
               data-tooltip-pos="bottom"
             >
-              <LockIcon locked={readOnly} />
-            </button>
-            <button
-              type="button"
-              className={`${styles.iconToggle} ${
-                advanced && !readOnly ? styles.iconToggleActive : ""
-              }`}
-              onClick={() => !readOnly && setAdvanced((v) => !v)}
-              disabled={readOnly}
-              aria-pressed={advanced && !readOnly}
-              data-tooltip={
-                readOnly
-                  ? "Advanced mode disabled while read only"
-                  : advanced
-                    ? "Disable advanced mode"
-                    : "Enable advanced mode"
-              }
-              data-tooltip-pos="bottom"
-            >
-              <SlidersIcon />
+              New
             </button>
           </div>
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <button
-            type="button"
-            className={styles.btnGhost}
-            onClick={handleReset}
-            data-tooltip="Discard and start over"
-            data-tooltip-pos="bottom"
-          >
-            New
-          </button>
+
           <button
             type="button"
             className={styles.btnPrimary}
             onClick={handleDownload}
           >
-            ↓ Download JSON
+            ↓ Download
           </button>
         </div>
       </header>
