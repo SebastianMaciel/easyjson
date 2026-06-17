@@ -1,66 +1,143 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useState } from "react";
+import Uploader from "@/components/Uploader";
+import TreeView from "@/components/TreeView";
+import Editor from "@/components/Editor";
+import {
+  type JSONValue,
+  type Path,
+  getAt,
+  isContainer,
+  pretty,
+} from "@/lib/json";
 import styles from "./page.module.css";
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
+export default function Page() {
+  const [data, setData] = useState<JSONValue | null>(null);
+  const [original, setOriginal] = useState<JSONValue | null>(null);
+  const [filename, setFilename] = useState("untitled.json");
+  const [selected, setSelected] = useState<Path>([]);
+  const [advanced, setAdvanced] = useState(false);
+
+  const handleLoad = useCallback((value: JSONValue, name: string) => {
+    setData(value);
+    setOriginal(structuredClone(value));
+    setFilename(name);
+    setSelected([]);
+  }, []);
+
+  const handleChange = useCallback(
+    (next: JSONValue) => {
+      setData(next);
+      let path = selected;
+      while (path.length > 0 && getAt(next, path) === undefined) {
+        path = path.slice(0, -1);
+      }
+      if (path.length !== selected.length) setSelected(path);
+    },
+    [selected],
+  );
+
+  const handleReset = useCallback(() => {
+    if (!data || confirm("Discard current JSON and start over?")) {
+      setData(null);
+      setOriginal(null);
+      setSelected([]);
+    }
+  }, [data]);
+
+  const handleDownload = useCallback(() => {
+    if (data === null) return;
+    const blob = new Blob([pretty(data)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const safeName = filename.replace(/\.json$/i, "") + ".json";
+    a.href = url;
+    a.download = safeName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, [data, filename]);
+
+  if (data === null) {
+    return (
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <header className={styles.headerEmpty}>
+          <span className={styles.brand}>easyjson</span>
+          <span className={styles.tag}>read · edit · download</span>
+        </header>
+        <Uploader onLoad={handleLoad} />
       </main>
-    </div>
+    );
+  }
+
+  return (
+    <main className={styles.main}>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <span className={styles.brand}>easyjson</span>
+          <input
+            type="text"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+            className={styles.filenameInput}
+            aria-label="Filename"
+          />
+        </div>
+        <div className={styles.headerRight}>
+          <label className={styles.advancedToggle}>
+            <input
+              type="checkbox"
+              checked={advanced}
+              onChange={(e) => setAdvanced(e.target.checked)}
+            />
+            <span>Advanced mode</span>
+          </label>
+          <button
+            type="button"
+            className={styles.btnGhost}
+            onClick={handleReset}
+            title="Discard and start over"
+          >
+            New
+          </button>
+          <button
+            type="button"
+            className={styles.btnPrimary}
+            onClick={handleDownload}
+          >
+            ↓ Download JSON
+          </button>
+        </div>
+      </header>
+
+      <div className={styles.body}>
+        <aside className={styles.treePane} aria-label="JSON tree">
+          {isContainer(data) ? (
+            <TreeView root={data} selected={selected} onSelect={setSelected} />
+          ) : (
+            <div className={styles.treeEmpty}>
+              Root is a single value.
+              <br />
+              Edit it on the right.
+            </div>
+          )}
+        </aside>
+        <section className={styles.editorPane} aria-label="Editor">
+          <Editor
+            root={data}
+            original={original}
+            path={selected}
+            onChange={handleChange}
+            onNavigate={setSelected}
+            advanced={advanced}
+          />
+        </section>
+      </div>
+    </main>
   );
 }

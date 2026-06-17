@@ -1,0 +1,259 @@
+.editor {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+.crumbWrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.crumb {
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+.crumb:hover {
+  background: var(--bg-mute);
+  color: var(--ink);
+}
+
+.crumbActive {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.crumbSep {
+  margin: 0 0.15rem;
+  color: var(--line-strong);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionMeta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  background: var(--bg);
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--ink-mute);
+  text-align: center;
+  padding: 1rem 0;
+  font-style: italic;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr auto;
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.fieldActions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-top: 0.3rem;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.keyButton {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: left;
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.keyButton:not(:disabled):hover {
+  background: var(--bg-mute);
+}
+
+.keyButton:disabled {
+  cursor: default;
+}
+
+.keyInput {
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  width: 100%;
+}
+
+.indexBadge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-mute);
+  color: var(--ink-mute);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.fieldValue {
+  min-width: 0;
+}
+
+.input {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+.deleteBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--ink-mute);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.deleteBtn:hover {
+  background: #fee2e2;
+  color: var(--err);
+}
+
+.resetBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.resetBtn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.addBtn {
+  align-self: flex-start;
+  padding: 0.5rem 0.85rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--ink-mute);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.addBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.addRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  flex-wrap: wrap;
+}
+
+.addLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+.addConfirm {
+  padding: 0.45rem 0.85rem;
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.addConfirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.addConfirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  padding: 0.45rem 0.65rem;
+  color: var(--ink-mute);
+  font-size: 13px;
+}
+
+.cancelBtn:hover {
+  color: var(--ink);
+}
+
+.errMsg {
+  color: var(--err);
+  font-size: 12px;
+  margin-left: 0.25rem;
+}
