@@ -15,7 +15,8 @@ export default function ThemeToggle({ theme, onToggle }: Props) {
       className={styles.toggle}
       onClick={onToggle}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      data-tooltip={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      data-tooltip-pos="bottom"
     >
       {isDark ? (
         // sun

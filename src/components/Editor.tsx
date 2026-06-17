@@ -190,7 +190,7 @@ function ResetButton({
       className={styles.resetBtn}
       onClick={() => onReset(structuredClone(orig))}
       aria-label="Reset to original value"
-      title="Reset to original value"
+      data-tooltip="Reset to original value"
     >
       ↺
     </button>
@@ -468,7 +468,8 @@ function ChildRow({
             className={styles.keyButton}
             disabled={!advanced}
             onClick={() => advanced && setRenaming(true)}
-            title={advanced ? "Click to rename" : ""}
+            data-tooltip={advanced ? "Click to rename" : undefined}
+            data-tooltip-pos="bottom"
           >
             <span>{keyOrIndex}</span>
             {advanced && (
@@ -497,7 +498,7 @@ function ChildRow({
               className={styles.duplicateBtn}
               onClick={onDuplicate}
               aria-label={isArray ? "Duplicate item" : "Duplicate field"}
-              title={isArray ? "Duplicate item" : "Duplicate field"}
+              data-tooltip={isArray ? "Duplicate item" : "Duplicate field"}
             >
               ⎘
             </button>
@@ -506,7 +507,7 @@ function ChildRow({
               className={styles.deleteBtn}
               onClick={handleDelete}
               aria-label="Delete"
-              title="Delete"
+              data-tooltip="Delete"
             >
               ×
             </button>

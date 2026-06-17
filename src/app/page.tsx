@@ -245,7 +245,8 @@ function PageInner() {
             type="button"
             className={styles.btnGhost}
             onClick={handleReset}
-            title="Discard and start over"
+            data-tooltip="Discard and start over"
+            data-tooltip-pos="bottom"
           >
             New
           </button>
