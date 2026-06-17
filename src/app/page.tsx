@@ -5,6 +5,7 @@ import Uploader from "@/components/Uploader";
 import TreeView from "@/components/TreeView";
 import Editor from "@/components/Editor";
 import ThemeToggle from "@/components/ThemeToggle";
+import RawView from "@/components/RawView";
 import { ConfirmProvider, useConfirm } from "@/components/ConfirmDialog";
 import {
   type JSONValue,
@@ -36,6 +37,7 @@ function PageInner() {
   const [restored, setRestored] = useState(false);
   const [search, setSearch] = useState("");
   const [warning, setWarning] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"form" | "raw">("form");
 
   // hydrate theme + session from localStorage on mount
   useEffect(() => {
@@ -194,6 +196,30 @@ function PageInner() {
           />
         </div>
         <div className={styles.headerRight}>
+          <div className={styles.viewToggle} role="tablist" aria-label="View mode">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === "form"}
+              className={`${styles.viewBtn} ${
+                viewMode === "form" ? styles.viewBtnActive : ""
+              }`}
+              onClick={() => setViewMode("form")}
+            >
+              Form
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === "raw"}
+              className={`${styles.viewBtn} ${
+                viewMode === "raw" ? styles.viewBtnActive : ""
+              }`}
+              onClick={() => setViewMode("raw")}
+            >
+              Raw JSON
+            </button>
+          </div>
           <label className={styles.advancedToggle}>
             <input
               type="checkbox"
@@ -276,15 +302,19 @@ function PageInner() {
           )}
         </aside>
         <section className={styles.editorPane} aria-label="Editor">
-          <Editor
-            root={data}
-            original={original}
-            path={selected}
-            onChange={handleChange}
-            onDelete={handleDelete}
-            onNavigate={setSelected}
-            advanced={advanced}
-          />
+          {viewMode === "form" ? (
+            <Editor
+              root={data}
+              original={original}
+              path={selected}
+              onChange={handleChange}
+              onDelete={handleDelete}
+              onNavigate={setSelected}
+              advanced={advanced}
+            />
+          ) : (
+            <RawView data={data} />
+          )}
         </section>
       </div>
     </main>

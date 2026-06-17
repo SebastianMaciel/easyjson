@@ -70,6 +70,37 @@
   gap: 0.75rem;
 }
 
+.viewToggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.viewBtn {
+  padding: 0.4rem 0.75rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-mute);
+  background: transparent;
+  border-right: 1px solid var(--line);
+}
+
+.viewBtn:last-child {
+  border-right: none;
+}
+
+.viewBtn:hover:not(.viewBtnActive) {
+  background: var(--bg-mute);
+  color: var(--ink);
+}
+
+.viewBtnActive {
+  background: var(--ink);
+  color: var(--bg);
+}
+
 .advancedToggle {
   display: flex;
   align-items: center;
