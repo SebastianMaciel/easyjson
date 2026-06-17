@@ -7,6 +7,7 @@ import {
   type JSONArray,
   type JSONObject,
   type Path,
+  coerce,
   deepEqual,
   defaultValueFor,
   deleteAt,
@@ -159,7 +160,7 @@ function PrimitiveEditor({
           {advanced && canChangeType && (
             <TypeSelector
               current={t}
-              onChangeType={(nt) => onChange(defaultValueFor(nt))}
+              onChangeType={(nt) => onChange(coerce(value, nt))}
             />
           )}
         </div>
@@ -356,6 +357,31 @@ function ChildRow({
     onDelete();
   };
 
+  const handleTypeChange = async (newType: JSONType) => {
+    if (newType === t) return;
+    if (t === "object" || t === "array") {
+      const count =
+        t === "array"
+          ? (value as JSONArray).length
+          : Object.keys(value as JSONObject).length;
+      if (count > 0) {
+        const label = isArray ? `item [${keyOrIndex}]` : `"${keyOrIndex}"`;
+        const ok = await confirm({
+          title: `Change ${label} from ${t} to ${newType}?`,
+          description: `This ${t} contains ${count} ${
+            count === 1 ? (t === "array" ? "item" : "field") : t === "array" ? "items" : "fields"
+          }. Switching type will discard everything inside.`,
+          confirmLabel: "Change type",
+          variant: "danger",
+        });
+        if (!ok) return;
+      }
+      onChildChange(defaultValueFor(newType));
+      return;
+    }
+    onChildChange(coerce(value, newType));
+  };
+
   const commitRename = () => {
     setRenaming(false);
     if (draftKey && draftKey !== String(keyOrIndex)) onRename(draftKey);
@@ -406,10 +432,7 @@ function ChildRow({
         {reset && <ResetButton orig={reset.value} onReset={onReset} />}
         {advanced && (
           <>
-            <TypeSelector
-              current={t}
-              onChangeType={(nt) => onChildChange(defaultValueFor(nt))}
-            />
+            <TypeSelector current={t} onChangeType={handleTypeChange} />
             <button
               type="button"
               className={styles.deleteBtn}
