@@ -121,6 +121,11 @@ input, textarea, select {
   z-index: 100;
 }
 
+[data-tooltip]:hover,
+[data-tooltip]:focus-visible {
+  z-index: 200;
+}
+
 [data-tooltip]:hover::after,
 [data-tooltip]:focus-visible::after,
 [data-tooltip]:hover::before,
