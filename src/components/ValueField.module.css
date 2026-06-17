@@ -143,3 +143,96 @@
   color: var(--ink-mute);
   cursor: pointer;
 }
+
+.adornedWrap {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.adornedInput {
+  padding-right: 2.25rem;
+}
+
+.adornBtn {
+  position: absolute;
+  right: 0.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.adornBtn:hover {
+  background: var(--accent-soft);
+}
+
+.colorWrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.colorPicker {
+  width: 36px;
+  height: auto;
+  min-height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.colorPicker::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.colorPicker::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+.colorText {
+  flex: 1;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.uuidWrap {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.uuidInput {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding-right: 3.5rem;
+  letter-spacing: 0.02em;
+}
+
+.uuidBadge {
+  position: absolute;
+  right: 0.45rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  background: var(--bg-mute);
+  color: var(--ink-mute);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  pointer-events: none;
+}
