@@ -116,6 +116,26 @@
   gap: 0.4rem;
 }
 
+.helpBtn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink-mute);
+  background: transparent;
+  font-size: 15px;
+  font-weight: 700;
+  border: 1px solid var(--line);
+}
+
+.helpBtn:hover {
+  background: var(--bg-mute);
+  color: var(--ink);
+  border-color: var(--ink-mute);
+}
+
 .modeGroup {
   display: inline-flex;
   border: 1px solid var(--line);

@@ -6,7 +6,9 @@ import TreeView from "@/components/TreeView";
 import Editor from "@/components/Editor";
 import ThemeToggle from "@/components/ThemeToggle";
 import RawView from "@/components/RawView";
+import HelpModal from "@/components/HelpModal";
 import { ConfirmProvider, useConfirm } from "@/components/ConfirmDialog";
+import { LockIcon, SlidersIcon } from "@/components/icons";
 import {
   type JSONValue,
   type Path,
@@ -27,55 +29,6 @@ export default function Page() {
     <ConfirmProvider>
       <PageInner />
     </ConfirmProvider>
-  );
-}
-
-function LockIcon({ locked }: { locked: boolean }) {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      {locked ? (
-        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-      ) : (
-        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-      )}
-    </svg>
-  );
-}
-
-function SlidersIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <line x1="4" y1="21" x2="4" y2="14" />
-      <line x1="4" y1="10" x2="4" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12" y2="3" />
-      <line x1="20" y1="21" x2="20" y2="16" />
-      <line x1="20" y1="12" x2="20" y2="3" />
-      <line x1="1" y1="14" x2="7" y2="14" />
-      <line x1="9" y1="8" x2="15" y2="8" />
-      <line x1="17" y1="16" x2="23" y2="16" />
-    </svg>
   );
 }
 
@@ -133,6 +86,7 @@ function PageInner() {
   const [search, setSearch] = useState("");
   const [warning, setWarning] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"form" | "raw">("form");
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // hydrate theme + session from localStorage on mount
   useEffect(() => {
@@ -304,10 +258,21 @@ function PageInner() {
           <span className={styles.brand}>easyjson</span>
           <div className={styles.headerRight}>
             <span className={styles.tag}>read · edit · download</span>
+            <button
+              type="button"
+              className={styles.helpBtn}
+              onClick={() => setHelpOpen(true)}
+              aria-label="Help"
+              data-tooltip="How to use easyjson"
+              data-tooltip-pos="bottom"
+            >
+              ?
+            </button>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </header>
         <Uploader onLoad={handleLoad} />
+        <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       </main>
     );
   }
@@ -387,6 +352,16 @@ function PageInner() {
           </div>
 
           <div className={styles.headerGroup} aria-label="App settings">
+            <button
+              type="button"
+              className={styles.helpBtn}
+              onClick={() => setHelpOpen(true)}
+              aria-label="Help"
+              data-tooltip="How to use easyjson"
+              data-tooltip-pos="bottom"
+            >
+              ?
+            </button>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <button
               type="button"
@@ -408,6 +383,7 @@ function PageInner() {
           </button>
         </div>
       </header>
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
 
       {warning && (
         <div className={styles.warningBar} role="status">
