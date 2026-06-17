@@ -5,6 +5,7 @@ import Uploader from "@/components/Uploader";
 import TreeView from "@/components/TreeView";
 import Editor from "@/components/Editor";
 import ThemeToggle from "@/components/ThemeToggle";
+import { ConfirmProvider, useConfirm } from "@/components/ConfirmDialog";
 import {
   type JSONValue,
   type Path,
@@ -15,6 +16,15 @@ import {
 import styles from "./page.module.css";
 
 export default function Page() {
+  return (
+    <ConfirmProvider>
+      <PageInner />
+    </ConfirmProvider>
+  );
+}
+
+function PageInner() {
+  const confirm = useConfirm();
   const [data, setData] = useState<JSONValue | null>(null);
   const [original, setOriginal] = useState<JSONValue | null>(null);
   const [filename, setFilename] = useState("untitled.json");
@@ -107,13 +117,20 @@ export default function Page() {
     [selected],
   );
 
-  const handleReset = useCallback(() => {
-    if (!data || confirm("Discard current JSON and start over?")) {
-      setData(null);
-      setOriginal(null);
-      setSelected([]);
+  const handleReset = useCallback(async () => {
+    if (data !== null) {
+      const ok = await confirm({
+        title: "Discard JSON?",
+        description: "All your edits will be lost.",
+        confirmLabel: "Discard",
+        variant: "danger",
+      });
+      if (!ok) return;
     }
-  }, [data]);
+    setData(null);
+    setOriginal(null);
+    setSelected([]);
+  }, [data, confirm]);
 
   const handleDownload = useCallback(() => {
     if (data === null) return;
