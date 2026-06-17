@@ -30,6 +30,55 @@ export default function Page() {
   );
 }
 
+function LockIcon({ locked }: { locked: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      {locked ? (
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      ) : (
+        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+      )}
+    </svg>
+  );
+}
+
+function SlidersIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <line x1="4" y1="21" x2="4" y2="14" />
+      <line x1="4" y1="10" x2="4" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12" y2="3" />
+      <line x1="20" y1="21" x2="20" y2="16" />
+      <line x1="20" y1="12" x2="20" y2="3" />
+      <line x1="1" y1="14" x2="7" y2="14" />
+      <line x1="9" y1="8" x2="15" y2="8" />
+      <line x1="17" y1="16" x2="23" y2="16" />
+    </svg>
+  );
+}
+
 function FilenameField({
   filename,
   onChange,
@@ -295,27 +344,39 @@ function PageInner() {
               Raw JSON
             </button>
           </div>
-          <label className={styles.advancedToggle}>
-            <input
-              type="checkbox"
-              checked={readOnly}
-              onChange={(e) => setReadOnly(e.target.checked)}
-            />
-            <span>Read only</span>
-          </label>
-          <label
-            className={`${styles.advancedToggle} ${
-              readOnly ? styles.toggleDisabled : ""
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={advanced && !readOnly}
+          <div className={styles.modeGroup}>
+            <button
+              type="button"
+              className={`${styles.iconToggle} ${
+                readOnly ? styles.iconToggleActive : ""
+              }`}
+              onClick={() => setReadOnly((v) => !v)}
+              aria-pressed={readOnly}
+              data-tooltip={readOnly ? "Disable read only" : "Enable read only"}
+              data-tooltip-pos="bottom"
+            >
+              <LockIcon locked={readOnly} />
+            </button>
+            <button
+              type="button"
+              className={`${styles.iconToggle} ${
+                advanced && !readOnly ? styles.iconToggleActive : ""
+              }`}
+              onClick={() => !readOnly && setAdvanced((v) => !v)}
               disabled={readOnly}
-              onChange={(e) => setAdvanced(e.target.checked)}
-            />
-            <span>Advanced mode</span>
-          </label>
+              aria-pressed={advanced && !readOnly}
+              data-tooltip={
+                readOnly
+                  ? "Advanced mode disabled while read only"
+                  : advanced
+                    ? "Disable advanced mode"
+                    : "Enable advanced mode"
+              }
+              data-tooltip-pos="bottom"
+            >
+              <SlidersIcon />
+            </button>
+          </div>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <button
             type="button"
