@@ -69,7 +69,7 @@
 .error {
   margin-top: 0.75rem;
   padding: 0.5rem 0.75rem;
-  background: #fee2e2;
+  background: var(--err-soft);
   color: var(--err);
   border-radius: var(--radius);
   font-size: 13px;

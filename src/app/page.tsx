@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Uploader from "@/components/Uploader";
 import TreeView from "@/components/TreeView";
 import Editor from "@/components/Editor";
+import ThemeToggle from "@/components/ThemeToggle";
 import {
   type JSONValue,
   type Path,
@@ -19,6 +20,33 @@ export default function Page() {
   const [filename, setFilename] = useState("untitled.json");
   const [selected, setSelected] = useState<Path>([]);
   const [advanced, setAdvanced] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // hydrate theme from localStorage / system preference
+  useEffect(() => {
+    const stored = localStorage.getItem("easyjson.theme");
+    if (stored === "light" || stored === "dark") {
+      setTheme(stored);
+    } else if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      setTheme("dark");
+    }
+  }, []);
+
+  // apply theme to <html>
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => {
+      const next = t === "dark" ? "light" : "dark";
+      localStorage.setItem("easyjson.theme", next);
+      return next;
+    });
+  }, []);
 
   const handleLoad = useCallback((value: JSONValue, name: string) => {
     setData(value);
@@ -68,7 +96,10 @@ export default function Page() {
       <main className={styles.main}>
         <header className={styles.headerEmpty}>
           <span className={styles.brand}>easyjson</span>
-          <span className={styles.tag}>read · edit · download</span>
+          <div className={styles.headerRight}>
+            <span className={styles.tag}>read · edit · download</span>
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          </div>
         </header>
         <Uploader onLoad={handleLoad} />
       </main>
@@ -97,6 +128,7 @@ export default function Page() {
             />
             <span>Advanced mode</span>
           </label>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <button
             type="button"
             className={styles.btnGhost}
