@@ -13,10 +13,12 @@ import {
   adjustPathAfterDelete,
   deleteAt,
   duplicateAt,
+  filenameIssues,
   getAt,
   isContainer,
   moveArrayItem,
   pretty,
+  sanitizeFilename,
 } from "@/lib/json";
 import styles from "./page.module.css";
 
@@ -25,6 +27,47 @@ export default function Page() {
     <ConfirmProvider>
       <PageInner />
     </ConfirmProvider>
+  );
+}
+
+function FilenameField({
+  filename,
+  onChange,
+}: {
+  filename: string;
+  onChange: (name: string) => void;
+}) {
+  const issues = filenameIssues(filename);
+  const sanitized = sanitizeFilename(filename);
+  const willChange = sanitized !== filename;
+  return (
+    <div className={styles.filenameWrap}>
+      <input
+        type="text"
+        value={filename}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${styles.filenameInput} ${
+          issues.length > 0 ? styles.filenameInputWarn : ""
+        }`}
+        aria-label="Filename"
+        aria-invalid={issues.length > 0 ? true : undefined}
+        spellCheck={false}
+      />
+      {issues.length > 0 && (
+        <span
+          className={styles.filenameWarn}
+          data-tooltip={
+            willChange
+              ? `${issues[0]}. Will save as "${sanitized}"`
+              : issues[0]
+          }
+          data-tooltip-pos="bottom"
+          aria-label="Filename warning"
+        >
+          !
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -194,9 +237,8 @@ function PageInner() {
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    const safeName = filename.replace(/\.json$/i, "") + ".json";
     a.href = url;
-    a.download = safeName;
+    a.download = sanitizeFilename(filename);
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -223,13 +265,7 @@ function PageInner() {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.brand}>easyjson</span>
-          <input
-            type="text"
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-            className={styles.filenameInput}
-            aria-label="Filename"
-          />
+          <FilenameField filename={filename} onChange={setFilename} />
         </div>
         <div className={styles.headerRight}>
           <div className={styles.viewToggle} role="tablist" aria-label="View mode">

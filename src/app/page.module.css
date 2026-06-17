@@ -15,6 +15,8 @@
   background: var(--bg);
   gap: 1rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 20;
 }
 
 .headerEmpty {
@@ -43,10 +45,18 @@
   flex: 1;
 }
 
-.filenameInput {
+.filenameWrap {
+  position: relative;
   flex: 0 1 320px;
   min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.filenameInput {
+  width: 100%;
   padding: 0.4rem 0.6rem;
+  padding-right: 1.75rem;
   border: 1px solid transparent;
   border-radius: var(--radius);
   font-family: var(--font-mono);
@@ -62,6 +72,33 @@
 .filenameInput:focus {
   background: var(--bg);
   border-color: var(--accent);
+}
+
+.filenameInputWarn {
+  border-color: var(--warn);
+}
+
+.filenameInputWarn:focus {
+  border-color: var(--warn);
+}
+
+.filenameWarn {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--warn);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  cursor: help;
 }
 
 .headerRight {
