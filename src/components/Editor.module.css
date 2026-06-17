@@ -119,6 +119,13 @@
   cursor: default;
 }
 
+.keyInputWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
 .keyInput {
   padding: 0.3rem 0.4rem;
   border: 1px solid var(--accent);
@@ -128,6 +135,19 @@
   font-size: 13px;
   font-weight: 500;
   width: 100%;
+}
+
+.keyInputErr {
+  border-color: var(--err);
+  background: var(--err-soft);
+}
+
+.keyError {
+  font-size: 11px;
+  color: var(--err);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .indexBadge {

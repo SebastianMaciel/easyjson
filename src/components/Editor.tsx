@@ -232,6 +232,7 @@ function ObjectEditor({
               keyOrIndex={k}
               value={obj[k]}
               advanced={advanced}
+              siblingKeys={keys}
               reset={resetInfo([...path, k])}
               onReset={(v) => onChange(setAt(root, [...path, k], v))}
               onChildChange={(v) => onChildChange(k, v)}
@@ -292,6 +293,7 @@ function ArrayEditor({
               keyOrIndex={i}
               value={v}
               advanced={advanced}
+              siblingKeys={[]}
               reset={resetInfo([...path, i])}
               onReset={(nv) => onChange(setAt(root, [...path, i], nv))}
               onChildChange={(nv) => onChildChange(i, nv)}
@@ -319,6 +321,7 @@ function ChildRow({
   keyOrIndex,
   value,
   advanced,
+  siblingKeys,
   reset,
   onReset,
   onChildChange,
@@ -331,6 +334,7 @@ function ChildRow({
   keyOrIndex: string | number;
   value: JSONValue;
   advanced: boolean;
+  siblingKeys: string[];
   reset: { value: JSONValue } | null;
   onReset: (v: JSONValue) => void;
   onChildChange: (v: JSONValue) => void;
@@ -342,6 +346,18 @@ function ChildRow({
   const confirm = useConfirm();
   const [renaming, setRenaming] = useState(false);
   const [draftKey, setDraftKey] = useState(String(keyOrIndex));
+
+  const trimmed = draftKey.trim();
+  const isEmpty = trimmed.length === 0;
+  const isDuplicate =
+    !isEmpty &&
+    trimmed !== String(keyOrIndex) &&
+    siblingKeys.includes(trimmed);
+  const renameError = isEmpty
+    ? "Field name can't be empty"
+    : isDuplicate
+      ? "Another field already uses this name"
+      : null;
 
   const handleDelete = async () => {
     if (t === "object" || t === "array") {
@@ -391,9 +407,15 @@ function ChildRow({
   };
 
   const commitRename = () => {
+    if (renameError) return;
     setRenaming(false);
-    if (draftKey && draftKey !== String(keyOrIndex)) onRename(draftKey);
+    if (trimmed !== String(keyOrIndex)) onRename(trimmed);
     else setDraftKey(String(keyOrIndex));
+  };
+
+  const cancelRename = () => {
+    setRenaming(false);
+    setDraftKey(String(keyOrIndex));
   };
 
   return (
@@ -402,20 +424,32 @@ function ChildRow({
         {isArray ? (
           <span className={styles.indexBadge}>[{keyOrIndex}]</span>
         ) : renaming ? (
-          <input
-            className={styles.keyInput}
-            value={draftKey}
-            autoFocus
-            onChange={(e) => setDraftKey(e.target.value)}
-            onBlur={commitRename}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commitRename();
-              if (e.key === "Escape") {
-                setRenaming(false);
-                setDraftKey(String(keyOrIndex));
+          <div className={styles.keyInputWrap}>
+            <input
+              className={`${styles.keyInput} ${renameError ? styles.keyInputErr : ""}`}
+              value={draftKey}
+              autoFocus
+              onChange={(e) => setDraftKey(e.target.value)}
+              onBlur={() => (renameError ? cancelRename() : commitRename())}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitRename();
+                if (e.key === "Escape") cancelRename();
+              }}
+              aria-invalid={renameError ? true : undefined}
+              aria-describedby={
+                renameError ? `${String(keyOrIndex)}-err` : undefined
               }
-            }}
-          />
+            />
+            {renameError && (
+              <span
+                id={`${String(keyOrIndex)}-err`}
+                className={styles.keyError}
+                role="alert"
+              >
+                {renameError}
+              </span>
+            )}
+          </div>
         ) : (
           <button
             type="button"
