@@ -28,6 +28,7 @@ type Props = {
   path: Path;
   onChange: (next: JSONValue) => void;
   onDelete: (path: Path) => void;
+  onDuplicate: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 };
@@ -38,6 +39,7 @@ export default function Editor({
   path,
   onChange,
   onDelete,
+  onDuplicate,
   onNavigate,
   advanced,
 }: Props) {
@@ -81,6 +83,7 @@ export default function Editor({
           onChange={onChange}
           onChildChange={handleChildChange}
           onDelete={onDelete}
+          onDuplicate={onDuplicate}
           onNavigate={onNavigate}
           advanced={advanced}
         />
@@ -93,6 +96,7 @@ export default function Editor({
           onChange={onChange}
           onChildChange={handleChildChange}
           onDelete={onDelete}
+          onDuplicate={onDuplicate}
           onNavigate={onNavigate}
           advanced={advanced}
         />
@@ -201,6 +205,7 @@ function ObjectEditor({
   onChange,
   onChildChange,
   onDelete,
+  onDuplicate,
   onNavigate,
   advanced,
 }: {
@@ -211,6 +216,7 @@ function ObjectEditor({
   onChange: (next: JSONValue) => void;
   onChildChange: (key: string | number, v: JSONValue) => void;
   onDelete: (path: Path) => void;
+  onDuplicate: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 }) {
@@ -239,6 +245,7 @@ function ObjectEditor({
               onNavigate={() => onNavigate([...path, k])}
               onRename={(newKey) => onChange(renameKey(root, path, k, newKey))}
               onDelete={() => onDelete([...path, k])}
+              onDuplicate={() => onDuplicate([...path, k])}
             />
           ))
         )}
@@ -263,6 +270,7 @@ function ArrayEditor({
   onChange,
   onChildChange,
   onDelete,
+  onDuplicate,
   onNavigate,
   advanced,
 }: {
@@ -273,6 +281,7 @@ function ArrayEditor({
   onChange: (next: JSONValue) => void;
   onChildChange: (key: string | number, v: JSONValue) => void;
   onDelete: (path: Path) => void;
+  onDuplicate: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 }) {
@@ -300,6 +309,7 @@ function ArrayEditor({
               onNavigate={() => onNavigate([...path, i])}
               onRename={() => {}}
               onDelete={() => onDelete([...path, i])}
+              onDuplicate={() => onDuplicate([...path, i])}
             />
           ))
         )}
@@ -328,6 +338,7 @@ function ChildRow({
   onNavigate,
   onRename,
   onDelete,
+  onDuplicate,
 }: {
   parentPath: Path;
   isArray: boolean;
@@ -341,6 +352,7 @@ function ChildRow({
   onNavigate: () => void;
   onRename: (newKey: string) => void;
   onDelete: () => void;
+  onDuplicate: () => void;
 }) {
   const t = typeOf(value);
   const confirm = useConfirm();
@@ -482,9 +494,19 @@ function ChildRow({
             <TypeSelector current={t} onChangeType={handleTypeChange} />
             <button
               type="button"
+              className={styles.duplicateBtn}
+              onClick={onDuplicate}
+              aria-label={isArray ? "Duplicate item" : "Duplicate field"}
+              title={isArray ? "Duplicate item" : "Duplicate field"}
+            >
+              ⎘
+            </button>
+            <button
+              type="button"
               className={styles.deleteBtn}
               onClick={handleDelete}
               aria-label="Delete"
+              title="Delete"
             >
               ×
             </button>

@@ -12,6 +12,7 @@ import {
   type Path,
   adjustPathAfterDelete,
   deleteAt,
+  duplicateAt,
   getAt,
   isContainer,
   pretty,
@@ -131,6 +132,17 @@ function PageInner() {
       if (data === null || path.length === 0) return;
       setData(deleteAt(data, path));
       setSelected((curr) => adjustPathAfterDelete(curr, path));
+    },
+    [data],
+  );
+
+  const handleDuplicate = useCallback(
+    (path: Path) => {
+      if (data === null) return;
+      const result = duplicateAt(data, path);
+      if (!result) return;
+      setData(result.root);
+      setSelected(result.newPath);
     },
     [data],
   );
@@ -309,6 +321,7 @@ function PageInner() {
               path={selected}
               onChange={handleChange}
               onDelete={handleDelete}
+              onDuplicate={handleDuplicate}
               onNavigate={setSelected}
               advanced={advanced}
             />

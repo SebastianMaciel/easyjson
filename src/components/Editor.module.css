@@ -219,6 +219,23 @@
   color: var(--err);
 }
 
+.duplicateBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--ink-mute);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.duplicateBtn:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
 .resetBtn {
   width: 28px;
   height: 28px;
