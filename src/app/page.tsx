@@ -21,19 +21,58 @@ export default function Page() {
   const [selected, setSelected] = useState<Path>([]);
   const [advanced, setAdvanced] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [restored, setRestored] = useState(false);
 
-  // hydrate theme from localStorage / system preference
+  // hydrate theme + session from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem("easyjson.theme");
-    if (stored === "light" || stored === "dark") {
-      setTheme(stored);
+    const storedTheme = localStorage.getItem("easyjson.theme");
+    if (storedTheme === "light" || storedTheme === "dark") {
+      setTheme(storedTheme);
     } else if (
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches
     ) {
       setTheme("dark");
     }
+
+    try {
+      const raw = localStorage.getItem("easyjson.session");
+      if (raw) {
+        const s = JSON.parse(raw) as {
+          data?: JSONValue;
+          original?: JSONValue;
+          filename?: string;
+          selected?: Path;
+          advanced?: boolean;
+        };
+        if (s.data !== undefined) setData(s.data);
+        if (s.original !== undefined) setOriginal(s.original);
+        if (typeof s.filename === "string") setFilename(s.filename);
+        if (Array.isArray(s.selected)) setSelected(s.selected);
+        if (typeof s.advanced === "boolean") setAdvanced(s.advanced);
+      }
+    } catch {
+      // ignore corrupted session
+    }
+    setRestored(true);
   }, []);
+
+  // persist session on every change (after initial restore)
+  useEffect(() => {
+    if (!restored) return;
+    if (data === null) {
+      localStorage.removeItem("easyjson.session");
+      return;
+    }
+    try {
+      localStorage.setItem(
+        "easyjson.session",
+        JSON.stringify({ data, original, filename, selected, advanced }),
+      );
+    } catch {
+      // quota exceeded or unavailable — silently ignore
+    }
+  }, [restored, data, original, filename, selected, advanced]);
 
   // apply theme to <html>
   useEffect(() => {
