@@ -128,3 +128,89 @@
   font-size: 13px;
   color: var(--ink-mute);
 }
+
+.pasteBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pasteTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--ink);
+  resize: vertical;
+  min-height: 140px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pasteTextarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.pasteValid {
+  border-color: var(--ok);
+}
+
+.pasteInvalid {
+  border-color: var(--err);
+}
+
+.pasteFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pasteStatus {
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pasteIdle {
+  color: var(--ink-mute);
+  font-family: var(--font-mono);
+}
+
+.pasteOk {
+  color: var(--ok);
+  font-weight: 500;
+}
+
+.pasteErr {
+  color: var(--err);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.pasteLoadBtn {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pasteLoadBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.pasteLoadBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
