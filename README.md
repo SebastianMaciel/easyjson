@@ -31,7 +31,7 @@ Everything happens **in your browser**. No upload, no signup, no account.
 | **TypeScript** | Type-safe state and JSON ops |
 | **CSS Modules** | Scoped, no runtime |
 | **react-window** | Tree virtualization for huge JSONs |
-| **Inter + JetBrains Mono** | Display + mono via `next/font/google` |
+| **Inter + Fraunces + Recursive** | Sans + serif + mono via `next/font/google` |
 
 ## Getting started
 
