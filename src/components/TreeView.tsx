@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   type JSONValue,
+  type JSONObject,
   type Path,
   isContainer,
   pathKey,
@@ -13,13 +14,35 @@ import styles from "./TreeView.module.css";
 type Props = {
   root: JSONValue;
   selected: Path;
+  query: string;
   onSelect: (p: Path) => void;
 };
 
-export default function TreeView({ root, selected, onSelect }: Props) {
+export default function TreeView({ root, selected, query, onSelect }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set([pathKey([])]),
   );
+
+  const trimmed = query.trim().toLowerCase();
+
+  // compute which nodes match the query (themselves or have matching descendants)
+  const visible = useMemo(() => {
+    if (!trimmed) return null;
+    const set = new Set<string>();
+    walk(root, [], trimmed, set);
+    return set;
+  }, [root, trimmed]);
+
+  // when querying, auto-expand all visible containers
+  const effectiveExpanded = useMemo(() => {
+    if (!visible) return expanded;
+    return new Set<string>([...expanded, ...visible]);
+  }, [expanded, visible]);
+
+  // when the query changes, ensure we auto-expand even though base expanded didn't change
+  useEffect(() => {
+    // no-op; effectiveExpanded already merges in visible
+  }, [visible]);
 
   const toggle = (path: Path) => {
     const key = pathKey(path);
@@ -38,7 +61,9 @@ export default function TreeView({ root, selected, onSelect }: Props) {
         value={root}
         path={[]}
         selected={selected}
-        expanded={expanded}
+        expanded={effectiveExpanded}
+        visible={visible}
+        query={trimmed}
         onToggle={toggle}
         onSelect={onSelect}
         isRoot
@@ -47,12 +72,44 @@ export default function TreeView({ root, selected, onSelect }: Props) {
   );
 }
 
+function walk(
+  value: JSONValue,
+  path: Path,
+  query: string,
+  out: Set<string>,
+): boolean {
+  let selfMatches = false;
+  if (path.length > 0) {
+    const lastKey = String(path[path.length - 1]).toLowerCase();
+    selfMatches = lastKey.includes(query);
+  }
+  let childMatches = false;
+  if (isContainer(value)) {
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => {
+        if (walk(v as JSONValue, [...path, i], query, out)) childMatches = true;
+      });
+    } else {
+      Object.entries(value as JSONObject).forEach(([k, v]) => {
+        if (walk(v as JSONValue, [...path, k], query, out)) childMatches = true;
+      });
+    }
+  }
+  if (selfMatches || childMatches) {
+    out.add(pathKey(path));
+    return true;
+  }
+  return false;
+}
+
 type NodeProps = {
   nodeKey: string;
   value: JSONValue;
   path: Path;
   selected: Path;
   expanded: Set<string>;
+  visible: Set<string> | null;
+  query: string;
   onToggle: (p: Path) => void;
   onSelect: (p: Path) => void;
   isRoot?: boolean;
@@ -64,6 +121,8 @@ function TreeNode({
   path,
   selected,
   expanded,
+  visible,
+  query,
   onToggle,
   onSelect,
   isRoot,
@@ -90,6 +149,10 @@ function TreeNode({
       }),
     );
   }, [container, t, value, path]);
+
+  const visibleChildren = visible
+    ? children.filter((c) => visible.has(pathKey(c.path)))
+    : children;
 
   const label = isRoot ? "root" : nodeKey;
   const previewSuffix = container
@@ -119,12 +182,12 @@ function TreeNode({
         ) : (
           <span className={styles.chevronSpace} />
         )}
-        <span className={styles.label}>{label}</span>
+        <span className={styles.label}>{highlight(label, query)}</span>
         <span className={styles.meta}>{previewSuffix || `: ${preview(value)}`}</span>
       </div>
-      {container && isExpanded && children.length > 0 && (
+      {container && isExpanded && visibleChildren.length > 0 && (
         <ul className={styles.children}>
-          {children.map((c) => (
+          {visibleChildren.map((c) => (
             <TreeNode
               key={c.key}
               nodeKey={c.key}
@@ -132,6 +195,8 @@ function TreeNode({
               path={c.path}
               selected={selected}
               expanded={expanded}
+              visible={visible}
+              query={query}
               onToggle={onToggle}
               onSelect={onSelect}
             />
@@ -150,4 +215,20 @@ function preview(v: JSONValue): string {
   }
   if (t === "null") return "null";
   return String(v);
+}
+
+function highlight(text: string, query: string) {
+  if (!query) return text;
+  const lower = text.toLowerCase();
+  const idx = lower.indexOf(query);
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className={styles.highlight}>
+        {text.slice(idx, idx + query.length)}
+      </mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
 }

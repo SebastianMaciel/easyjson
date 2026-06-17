@@ -22,6 +22,7 @@ export default function Page() {
   const [advanced, setAdvanced] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [restored, setRestored] = useState(false);
+  const [search, setSearch] = useState("");
 
   // hydrate theme + session from localStorage on mount
   useEffect(() => {
@@ -188,8 +189,35 @@ export default function Page() {
 
       <div className={styles.body}>
         <aside className={styles.treePane} aria-label="JSON tree">
+          {isContainer(data) && (
+            <div className={styles.treeSearch}>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search fields…"
+                className={styles.searchInput}
+                aria-label="Search fields"
+              />
+              {search && (
+                <button
+                  type="button"
+                  className={styles.searchClear}
+                  onClick={() => setSearch("")}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          )}
           {isContainer(data) ? (
-            <TreeView root={data} selected={selected} onSelect={setSelected} />
+            <TreeView
+              root={data}
+              selected={selected}
+              query={search}
+              onSelect={setSelected}
+            />
           ) : (
             <div className={styles.treeEmpty}>
               Root is a single value.

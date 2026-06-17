@@ -123,6 +123,56 @@
   border-right: 1px solid var(--line);
   overflow-y: auto;
   background: var(--bg-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+.treeSearch {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.searchInput:focus {
+  border-color: var(--accent);
+}
+
+.searchInput::-webkit-search-cancel-button {
+  display: none;
+}
+
+.searchClear {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--ink-mute);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.searchClear:hover {
+  background: var(--bg-mute);
+  color: var(--ink);
 }
 
 .treeEmpty {
