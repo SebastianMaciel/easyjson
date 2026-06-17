@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Inter, Fraunces, Recursive } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,17 +7,17 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const serif = Instrument_Serif({
+const serif = Fraunces({
   variable: "--font-serif",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
 });
 
-const mono = JetBrains_Mono({
+const mono = Recursive({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {

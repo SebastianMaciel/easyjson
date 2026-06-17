@@ -1,41 +1,45 @@
 :root {
-  /* Warm document / Notion-style palette */
-  --bg: #fbfaf5;
-  --bg-soft: #f5f0e3;
-  --bg-mute: #ebe2cc;
-  --ink: #2a2418;
-  --ink-mute: #7a6f5e;
-  --line: #e6dfc9;
-  --line-strong: #ccc0a1;
-  --accent: #b54a23;        /* terracotta */
-  --accent-soft: #f3dccf;
-  --accent-contrast: #fbfaf5;
-  --ok: #4e7a4c;            /* sage */
-  --warn: #b87010;          /* warm amber */
-  --err: #b3322a;
-  --err-soft: #f3d4cf;
-  --radius: 8px;
+  /* Cozy / cottage palette — cream, peach, sage, lavender, cocoa */
+  --bg: #fbf4ec;
+  --bg-soft: #f5ebdd;
+  --bg-mute: #ead9c8;
+  --ink: #4a2f2a;
+  --ink-mute: #7a5b54;
+  --line: #ead9c8;
+  --line-strong: #d4b6a0;
+  --accent: #b86d4f;          /* warm terracotta */
+  --accent-soft: #f4c9b8;     /* peach */
+  --accent-contrast: #fffaf2;
+  --ok: #7a8c5d;              /* sage */
+  --warn: #c9952b;            /* mustard */
+  --err: #b86b6b;
+  --err-soft: #f4d8d8;
+  --lilac: #d8c8e8;           /* cozy lavender accent */
+  --sage: #cfd9c1;            /* cozy sage accent */
+  --radius: 12px;
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-serif: "Instrument Serif", "Georgia", serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-serif: "Fraunces", "Georgia", serif;
+  --font-mono: "Recursive", ui-monospace, monospace;
 }
 
 [data-theme="dark"] {
-  --bg: #1c1812;
-  --bg-soft: #25201a;
-  --bg-mute: #322b22;
-  --ink: #ece4d2;
-  --ink-mute: #9d8f78;
-  --line: #3a3328;
-  --line-strong: #524938;
-  --accent: #e07c5a;
-  --accent-soft: #4a2418;
-  --accent-contrast: #1c1812;
-  --ok: #87b07f;
-  --warn: #d9a35f;
-  --err: #e0746b;
-  --err-soft: #4a201a;
+  --bg: #2a201c;
+  --bg-soft: #332823;
+  --bg-mute: #3f312a;
+  --ink: #f4e6d4;
+  --ink-mute: #b89c84;
+  --line: #4a3a32;
+  --line-strong: #6b5648;
+  --accent: #e0a585;
+  --accent-soft: #5b3f3a;
+  --accent-contrast: #2a201c;
+  --ok: #a8b88c;
+  --warn: #e0b870;
+  --err: #d49090;
+  --err-soft: #4a2828;
+  --lilac: #5d4a6b;
+  --sage: #4a5a3f;
 }
 
 * {
