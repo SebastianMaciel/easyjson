@@ -9,6 +9,8 @@ import { ConfirmProvider, useConfirm } from "@/components/ConfirmDialog";
 import {
   type JSONValue,
   type Path,
+  adjustPathAfterDelete,
+  deleteAt,
   getAt,
   isContainer,
   pretty,
@@ -120,6 +122,15 @@ function PageInner() {
       if (path.length !== selected.length) setSelected(path);
     },
     [selected],
+  );
+
+  const handleDelete = useCallback(
+    (path: Path) => {
+      if (data === null || path.length === 0) return;
+      setData(deleteAt(data, path));
+      setSelected((curr) => adjustPathAfterDelete(curr, path));
+    },
+    [data],
   );
 
   const handleReset = useCallback(async () => {
@@ -270,6 +281,7 @@ function PageInner() {
             original={original}
             path={selected}
             onChange={handleChange}
+            onDelete={handleDelete}
             onNavigate={setSelected}
             advanced={advanced}
           />

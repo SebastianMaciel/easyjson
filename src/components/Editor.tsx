@@ -27,6 +27,7 @@ type Props = {
   original: JSONValue | null;
   path: Path;
   onChange: (next: JSONValue) => void;
+  onDelete: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 };
@@ -36,6 +37,7 @@ export default function Editor({
   original,
   path,
   onChange,
+  onDelete,
   onNavigate,
   advanced,
 }: Props) {
@@ -78,6 +80,7 @@ export default function Editor({
           resetInfo={resetInfo}
           onChange={onChange}
           onChildChange={handleChildChange}
+          onDelete={onDelete}
           onNavigate={onNavigate}
           advanced={advanced}
         />
@@ -89,6 +92,7 @@ export default function Editor({
           resetInfo={resetInfo}
           onChange={onChange}
           onChildChange={handleChildChange}
+          onDelete={onDelete}
           onNavigate={onNavigate}
           advanced={advanced}
         />
@@ -196,6 +200,7 @@ function ObjectEditor({
   resetInfo,
   onChange,
   onChildChange,
+  onDelete,
   onNavigate,
   advanced,
 }: {
@@ -205,6 +210,7 @@ function ObjectEditor({
   resetInfo: (p: Path) => { value: JSONValue } | null;
   onChange: (next: JSONValue) => void;
   onChildChange: (key: string | number, v: JSONValue) => void;
+  onDelete: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 }) {
@@ -231,7 +237,7 @@ function ObjectEditor({
               onChildChange={(v) => onChildChange(k, v)}
               onNavigate={() => onNavigate([...path, k])}
               onRename={(newKey) => onChange(renameKey(root, path, k, newKey))}
-              onDelete={() => onChange(deleteAt(root, [...path, k]))}
+              onDelete={() => onDelete([...path, k])}
             />
           ))
         )}
@@ -255,6 +261,7 @@ function ArrayEditor({
   resetInfo,
   onChange,
   onChildChange,
+  onDelete,
   onNavigate,
   advanced,
 }: {
@@ -264,6 +271,7 @@ function ArrayEditor({
   resetInfo: (p: Path) => { value: JSONValue } | null;
   onChange: (next: JSONValue) => void;
   onChildChange: (key: string | number, v: JSONValue) => void;
+  onDelete: (path: Path) => void;
   onNavigate: (p: Path) => void;
   advanced: boolean;
 }) {
@@ -289,7 +297,7 @@ function ArrayEditor({
               onChildChange={(nv) => onChildChange(i, nv)}
               onNavigate={() => onNavigate([...path, i])}
               onRename={() => {}}
-              onDelete={() => onChange(deleteAt(root, [...path, i]))}
+              onDelete={() => onDelete([...path, i])}
             />
           ))
         )}
