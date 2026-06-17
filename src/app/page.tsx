@@ -161,6 +161,16 @@ function PageInner() {
       setFilename(name);
       setSelected([]);
       setWarning(warn ?? null);
+      // empty container → no values to edit, force advanced so the user can add fields
+      if (
+        isContainer(value) &&
+        (Array.isArray(value)
+          ? value.length === 0
+          : Object.keys(value).length === 0)
+      ) {
+        setAdvanced(true);
+        setReadOnly(false);
+      }
     },
     [],
   );
