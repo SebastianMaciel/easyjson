@@ -96,6 +96,8 @@ export default function Uploader({ onLoad }: Props) {
           type="file"
           accept="application/json,.json,text/plain"
           className={styles.input}
+          aria-label="Upload JSON file"
+          tabIndex={-1}
           onChange={(e) => accept(e.target.files?.[0])}
         />
         <div className={styles.icon} aria-hidden="true">{ }</div>
