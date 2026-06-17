@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
   type JSONValue,
   type JSONType,
+  type JSONArray,
+  type JSONObject,
   type Path,
   deepEqual,
   defaultValueFor,
@@ -16,6 +18,7 @@ import {
   typeOf,
 } from "@/lib/json";
 import ValueField, { TypeSelector } from "./ValueField";
+import { useConfirm } from "./ConfirmDialog";
 import styles from "./Editor.module.css";
 
 type Props = {
@@ -327,8 +330,31 @@ function ChildRow({
   onDelete: () => void;
 }) {
   const t = typeOf(value);
+  const confirm = useConfirm();
   const [renaming, setRenaming] = useState(false);
   const [draftKey, setDraftKey] = useState(String(keyOrIndex));
+
+  const handleDelete = async () => {
+    if (t === "object" || t === "array") {
+      const count =
+        t === "array"
+          ? (value as JSONArray).length
+          : Object.keys(value as JSONObject).length;
+      if (count > 0) {
+        const label = isArray ? `item [${keyOrIndex}]` : `"${keyOrIndex}"`;
+        const ok = await confirm({
+          title: `Delete ${label}?`,
+          description: `This ${t} contains ${count} ${
+            count === 1 ? (t === "array" ? "item" : "field") : t === "array" ? "items" : "fields"
+          }. Everything inside will be removed.`,
+          confirmLabel: "Delete",
+          variant: "danger",
+        });
+        if (!ok) return;
+      }
+    }
+    onDelete();
+  };
 
   const commitRename = () => {
     setRenaming(false);
@@ -387,7 +413,7 @@ function ChildRow({
             <button
               type="button"
               className={styles.deleteBtn}
-              onClick={onDelete}
+              onClick={handleDelete}
               aria-label="Delete"
             >
               ×
