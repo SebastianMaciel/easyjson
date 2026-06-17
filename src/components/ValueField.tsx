@@ -75,16 +75,29 @@ export default function ValueField({ value, onChange, onOpen, advanced }: Props)
   if (t === "null") {
     return (
       <div className={styles.nullValue}>
-        <span className={styles.nullBadge}>null</span>
-        {advanced && (
-          <button
-            type="button"
-            className={styles.linkBtn}
-            onClick={() => onChange("")}
-          >
-            convert to text
-          </button>
-        )}
+        <span className={styles.nullBadge}>empty (null)</span>
+        <span className={styles.nullHint}>Set as:</span>
+        <button
+          type="button"
+          className={styles.nullSetBtn}
+          onClick={() => onChange("")}
+        >
+          text
+        </button>
+        <button
+          type="button"
+          className={styles.nullSetBtn}
+          onClick={() => onChange(0)}
+        >
+          number
+        </button>
+        <button
+          type="button"
+          className={styles.nullSetBtn}
+          onClick={() => onChange(false)}
+        >
+          yes / no
+        </button>
       </div>
     );
   }
