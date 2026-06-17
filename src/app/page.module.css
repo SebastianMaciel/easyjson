@@ -112,6 +112,55 @@
 }
 
 
+.warningBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: color-mix(in srgb, var(--warn) 16%, var(--bg));
+  border-bottom: 1px solid var(--warn);
+  font-size: 13px;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+.warningIcon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--warn);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.warningText {
+  flex: 1;
+  min-width: 0;
+}
+
+.warningClose {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--ink-mute);
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.warningClose:hover {
+  background: var(--bg-mute);
+  color: var(--ink);
+}
+
 .body {
   flex: 1;
   display: grid;

@@ -1,12 +1,20 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { JSONValue } from "@/lib/json";
+import { type JSONValue, detectUnsafeIntegers } from "@/lib/json";
 import styles from "./Uploader.module.css";
 
 type Props = {
-  onLoad: (data: JSONValue, filename: string) => void;
+  onLoad: (data: JSONValue, filename: string, warning?: string | null) => void;
 };
+
+function unsafeWarning(text: string): string | null {
+  const unsafe = detectUnsafeIntegers(text);
+  if (unsafe.length === 0) return null;
+  const sample = unsafe.slice(0, 3).join(", ");
+  const more = unsafe.length > 3 ? ` and ${unsafe.length - 3} more` : "";
+  return `${unsafe.length} large integer${unsafe.length === 1 ? "" : "s"} (e.g. ${sample}${more}) exceed JavaScript's safe range — they have lost precision.`;
+}
 
 export default function Uploader({ onLoad }: Props) {
   const [drag, setDrag] = useState(false);
@@ -23,7 +31,7 @@ export default function Uploader({ onLoad }: Props) {
         const text = await file.text();
         const data = JSON.parse(text);
         setError(null);
-        onLoad(data, file.name);
+        onLoad(data, file.name, unsafeWarning(text));
       } catch (e) {
         setError(
           e instanceof Error
@@ -54,7 +62,7 @@ export default function Uploader({ onLoad }: Props) {
 
   const submitPaste = () => {
     if (!pasteParse.ok) return;
-    onLoad(pasteParse.value as JSONValue, "pasted.json");
+    onLoad(pasteParse.value as JSONValue, "pasted.json", unsafeWarning(pasteText));
     setPasteText("");
     setPasteOpen(false);
   };

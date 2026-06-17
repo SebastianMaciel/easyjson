@@ -33,6 +33,7 @@ function PageInner() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [restored, setRestored] = useState(false);
   const [search, setSearch] = useState("");
+  const [warning, setWarning] = useState<string | null>(null);
 
   // hydrate theme + session from localStorage on mount
   useEffect(() => {
@@ -98,12 +99,16 @@ function PageInner() {
     });
   }, []);
 
-  const handleLoad = useCallback((value: JSONValue, name: string) => {
-    setData(value);
-    setOriginal(structuredClone(value));
-    setFilename(name);
-    setSelected([]);
-  }, []);
+  const handleLoad = useCallback(
+    (value: JSONValue, name: string, warn?: string | null) => {
+      setData(value);
+      setOriginal(structuredClone(value));
+      setFilename(name);
+      setSelected([]);
+      setWarning(warn ?? null);
+    },
+    [],
+  );
 
   const handleChange = useCallback(
     (next: JSONValue) => {
@@ -130,6 +135,7 @@ function PageInner() {
     setData(null);
     setOriginal(null);
     setSelected([]);
+    setWarning(null);
   }, [data, confirm]);
 
   const handleDownload = useCallback(() => {
@@ -203,6 +209,21 @@ function PageInner() {
           </button>
         </div>
       </header>
+
+      {warning && (
+        <div className={styles.warningBar} role="status">
+          <span className={styles.warningIcon} aria-hidden="true">!</span>
+          <span className={styles.warningText}>{warning}</span>
+          <button
+            type="button"
+            className={styles.warningClose}
+            onClick={() => setWarning(null)}
+            aria-label="Dismiss warning"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className={styles.body}>
         <aside className={styles.treePane} aria-label="JSON tree">
